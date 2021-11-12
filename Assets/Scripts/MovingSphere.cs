@@ -7,7 +7,7 @@ using UnityEngine;
 public class MovingSphere : MonoBehaviour
 {
     [SerializeField, Range(0f, 100f)]
-    float maxAcceleration = 10f;
+    float maxAcceleration = 10f, maxAirAcceleration = 1f;
 
     [SerializeField, Range(0f, 100f)]
     float maxSpeed = 10f;
@@ -48,8 +48,10 @@ public class MovingSphere : MonoBehaviour
     {
 
         UpdateState();
+        //make air movement different from ground movement
+        float acceleration = isGrounded ? maxAcceleration : maxAirAcceleration;
         //find maximum speed change this update
-        float maxSpeedChange = maxAcceleration * Time.fixedDeltaTime;
+        float maxSpeedChange = acceleration * Time.fixedDeltaTime;
         velocity.x =
             Mathf.MoveTowards(velocity.x, desiredVelocity.x, maxSpeedChange);
         velocity.z =
