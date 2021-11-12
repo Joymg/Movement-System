@@ -15,6 +15,9 @@ public class MovingSphere : MonoBehaviour
     [SerializeField]
     Rect allowedArea = new Rect(-5f, -5f, 10f, 10f);
 
+    [SerializeField, Range(0f, 1f)]
+	float bounciness = 0.5f;
+
     Vector3 velocity;
 
     // Start is called before the first frame update
@@ -81,22 +84,30 @@ public class MovingSphere : MonoBehaviour
             if (newPosition.x < allowedArea.xMin)
             {
                 newPosition.x = allowedArea.xMin;
-                velocity.x = 0f;
+                //velocity.x = 0f;
+                //Bouncing
+                velocity.x = -velocity.x;
             }
             else if (newPosition.x > allowedArea.xMax)
             {
                 newPosition.x = allowedArea.xMax;
-                velocity.x = 0f;
+                //velocity.x = 0f;
+                //Bouncing
+                velocity.x = -velocity.x;
             }
             if (newPosition.z < allowedArea.yMin)
             {
                 newPosition.z = allowedArea.yMin;
-                velocity.z = 0f;
+                //velocity.z = 0f;
+                //Bouncing
+                velocity.z = -velocity.z;
             }
             else if (newPosition.z > allowedArea.yMax)
             {
                 newPosition.z = allowedArea.yMax;
-                velocity.z = 0f;
+                //velocity.z = 0f;
+                //Bouncing
+                velocity.z = -velocity.z;
             }
         }
         transform.localPosition = newPosition;
