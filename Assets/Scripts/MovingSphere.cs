@@ -20,6 +20,7 @@ public class MovingSphere : MonoBehaviour
     Rigidbody body;
 
     bool desiredJump;
+    bool isGrounded;
 
     private void Awake()
     {
@@ -42,7 +43,6 @@ public class MovingSphere : MonoBehaviour
     private void FixedUpdate()
     {
 
-        
 
         velocity = body.velocity;
         //find maximum speed change this update
@@ -60,13 +60,29 @@ public class MovingSphere : MonoBehaviour
 
         body.velocity = velocity;
 
+        isGrounded = false;
 
     }
 
     void Jump()
     {
-        //Using gravity to calculate jump force
-        velocity.y += Mathf.Sqrt(-2f * Physics.gravity.y * jumpHeight);
+        if (isGrounded)
+        {
+            //Using gravity to calculate jump force
+            velocity.y += Mathf.Sqrt(-2f * Physics.gravity.y * jumpHeight);
+        }
     }
+
+    private void OnCollisionEnter(Collision collision)
+    {
+        isGrounded = true;
+    }
+
+    private void OnCollisionStay(Collision collision)
+    {
+        isGrounded = true;
+    }
+
+
 }
 
