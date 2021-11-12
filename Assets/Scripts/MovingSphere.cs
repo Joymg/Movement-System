@@ -75,14 +75,21 @@ public class MovingSphere : MonoBehaviour
 
     private void OnCollisionEnter(Collision collision)
     {
-        isGrounded = true;
+        EvaluateCollision(collision);
     }
 
     private void OnCollisionStay(Collision collision)
     {
-        isGrounded = true;
+        EvaluateCollision(collision);
     }
 
-
+    private void EvaluateCollision(Collision collision)
+    {
+        for (int i = 0; i < collision.contactCount; i++)
+        {
+            Vector3 normal = collision.GetContact(i).normal;
+            isGrounded |= normal.y >= 0.9f;
+        }
+    }
 }
 
