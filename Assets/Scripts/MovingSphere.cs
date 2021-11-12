@@ -18,8 +18,13 @@ public class MovingSphere : MonoBehaviour
     [SerializeField, Range(0, 5)]
     int maxAirJumps = 0;
 
+    //Setting custom groundAngle
+    [SerializeField, Range(0f, 90f)]
+    float maxGroundAngle = 25f;
+
     Vector3 velocity, desiredVelocity;
     int jumpPhase;
+    float minGroundDotProduct;
 
     Rigidbody body;
 
@@ -29,6 +34,7 @@ public class MovingSphere : MonoBehaviour
     private void Awake()
     {
         body = GetComponent<Rigidbody>();
+        OnValidate();
     }
 
     private void Update()
@@ -67,6 +73,11 @@ public class MovingSphere : MonoBehaviour
 
         isGrounded = false;
 
+    }
+
+    private void OnValidate()
+    {
+        minGroundDotProduct = Mathf.Cos(maxGroundAngle * Mathf.Deg2Rad);
     }
 
     private void UpdateState()
@@ -114,7 +125,7 @@ public class MovingSphere : MonoBehaviour
         for (int i = 0; i < collision.contactCount; i++)
         {
             Vector3 normal = collision.GetContact(i).normal;
-            isGrounded |= normal.y >= 0.9f;
+            isGrounded |= normal.y >= minGroundDotProduct;
         }
     }
 }
