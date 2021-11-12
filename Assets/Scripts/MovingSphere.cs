@@ -56,14 +56,9 @@ public class MovingSphere : MonoBehaviour
     {
 
         UpdateState();
-        //make air movement different from ground movement
-        float acceleration = isGrounded ? maxAcceleration : maxAirAcceleration;
-        //find maximum speed change this update
-        float maxSpeedChange = acceleration * Time.fixedDeltaTime;
-        velocity.x =
-            Mathf.MoveTowards(velocity.x, desiredVelocity.x, maxSpeedChange);
-        velocity.z =
-            Mathf.MoveTowards(velocity.z, desiredVelocity.z, maxSpeedChange);
+
+        AdjustVelocity();
+        
 
         if (desiredJump)
         {
@@ -142,5 +137,35 @@ public class MovingSphere : MonoBehaviour
             }
         }
     }
+
+    void AdjustVelocity()
+    {
+        //Determine projected axes by projecting vectors on contact plane
+        Vector3 xAxis = ProjectOnContactPlane(Vector3.right).normalized;
+        Vector3 zAxis = ProjectOnContactPlane(Vector3.forward).normalized;
+
+        //project currentvelocity on both vectors to get relatives speeds
+        float currentX = Vector3.Dot(velocity, xAxis);
+        float currentZ = Vector3.Dot(velocity, zAxis);
+
+        //make air movement different from ground movement
+        float acceleration = isGrounded ? maxAcceleration : maxAirAcceleration;
+        //find maximum speed change this update
+        float maxSpeedChange = acceleration * Time.deltaTime;
+
+        //calculate new speeds relatives to ground
+        float newX =
+            Mathf.MoveTowards(currentX, desiredVelocity.x, maxSpeedChange);
+        float newZ =
+            Mathf.MoveTowards(currentZ, desiredVelocity.z, maxSpeedChange);
+
+        //adjust velocity bya dding differences between new and old speeds
+        velocity += xAxis * (newX - currentX) + zAxis * (newZ - currentZ);
+    }
+    private Vector3 ProjectOnContactPlane(Vector3 vector)
+    {
+        return vector - contactNormal * Vector3.Dot(vector, contactNormal);
+    }
+
 }
 
