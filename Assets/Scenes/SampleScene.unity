@@ -129,7 +129,7 @@ Mesh:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: pb_Mesh-37354
+  m_Name: pb_Mesh48262
   serializedVersion: 10
   m_SubMeshes:
   - serializedVersion: 2
@@ -322,7 +322,7 @@ Rigidbody:
   m_AngularDrag: 0.05
   m_UseGravity: 1
   m_IsKinematic: 0
-  m_Interpolate: 1
+  m_Interpolate: 0
   m_Constraints: 112
   m_CollisionDetection: 0
 --- !u!114 &13813408
@@ -337,11 +337,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a379f181959196247a4c14a76efa2281, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  maxAcceleration: 20
-  maxAirAcceleration: 1
+  maxAcceleration: 100
+  maxAirAcceleration: 0
   maxSpeed: 10
   jumpHeight: 2
   maxAirJumps: 0
+  maxGroundAngle: 40
 --- !u!96 &13813409
 TrailRenderer:
   serializedVersion: 2
@@ -514,7 +515,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 41
+  m_RootOrder: 45
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &23164755
 GameObject:
@@ -881,7 +882,7 @@ Mesh:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: pb_Mesh-29024
+  m_Name: pb_Mesh48174
   serializedVersion: 10
   m_SubMeshes:
   - serializedVersion: 2
@@ -1074,7 +1075,7 @@ Rigidbody:
   m_AngularDrag: 0.05
   m_UseGravity: 1
   m_IsKinematic: 0
-  m_Interpolate: 1
+  m_Interpolate: 0
   m_Constraints: 112
   m_CollisionDetection: 0
 --- !u!114 &37204829
@@ -1089,11 +1090,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a379f181959196247a4c14a76efa2281, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  maxAcceleration: 20
-  maxAirAcceleration: 1
+  maxAcceleration: 100
+  maxAirAcceleration: 0
   maxSpeed: 10
   jumpHeight: 2
   maxAirJumps: 0
+  maxGroundAngle: 40
 --- !u!96 &37204830
 TrailRenderer:
   serializedVersion: 2
@@ -1266,7 +1268,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 34
+  m_RootOrder: 41
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &37836959
 GameObject:
@@ -1633,7 +1635,7 @@ Mesh:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: pb_Mesh-36608
+  m_Name: pb_Mesh48490
   serializedVersion: 10
   m_SubMeshes:
   - serializedVersion: 2
@@ -2515,7 +2517,7 @@ Mesh:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: pb_Mesh-37352
+  m_Name: pb_Mesh48454
   serializedVersion: 10
   m_SubMeshes:
   - serializedVersion: 2
@@ -3038,7 +3040,7 @@ Mesh:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: pb_Mesh-37356
+  m_Name: pb_Mesh48422
   serializedVersion: 10
   m_SubMeshes:
   - serializedVersion: 2
@@ -3202,7 +3204,7 @@ Mesh:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: pb_Mesh-28588
+  m_Name: pb_Mesh48328
   serializedVersion: 10
   m_SubMeshes:
   - serializedVersion: 2
@@ -3462,7 +3464,7 @@ Mesh:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: pb_Mesh-37044
+  m_Name: pb_Mesh48340
   serializedVersion: 10
   m_SubMeshes:
   - serializedVersion: 2
@@ -3654,11 +3656,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a379f181959196247a4c14a76efa2281, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  maxAcceleration: 20
-  maxAirAcceleration: 1
+  maxAcceleration: 100
+  maxAirAcceleration: 0
   maxSpeed: 10
   jumpHeight: 2
   maxAirJumps: 0
+  maxGroundAngle: 40
 --- !u!96 &304079371
 TrailRenderer:
   serializedVersion: 2
@@ -3846,7 +3849,7 @@ Rigidbody:
   m_AngularDrag: 0.05
   m_UseGravity: 1
   m_IsKinematic: 0
-  m_Interpolate: 1
+  m_Interpolate: 0
   m_Constraints: 112
   m_CollisionDetection: 0
 --- !u!43 &318437401
@@ -3855,7 +3858,7 @@ Mesh:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: pb_Mesh-37358
+  m_Name: pb_Mesh47970
   serializedVersion: 10
   m_SubMeshes:
   - serializedVersion: 2
@@ -4048,7 +4051,7 @@ Rigidbody:
   m_AngularDrag: 0.05
   m_UseGravity: 1
   m_IsKinematic: 0
-  m_Interpolate: 1
+  m_Interpolate: 0
   m_Constraints: 112
   m_CollisionDetection: 0
 --- !u!114 &321284335
@@ -4063,11 +4066,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a379f181959196247a4c14a76efa2281, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  maxAcceleration: 20
-  maxAirAcceleration: 1
+  maxAcceleration: 100
+  maxAirAcceleration: 0
   maxSpeed: 10
   jumpHeight: 2
   maxAirJumps: 0
+  maxGroundAngle: 40
 --- !u!96 &321284336
 TrailRenderer:
   serializedVersion: 2
@@ -4277,7 +4281,7 @@ Rigidbody:
   m_AngularDrag: 0.05
   m_UseGravity: 1
   m_IsKinematic: 0
-  m_Interpolate: 1
+  m_Interpolate: 0
   m_Constraints: 112
   m_CollisionDetection: 0
 --- !u!114 &406421777
@@ -4292,11 +4296,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a379f181959196247a4c14a76efa2281, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  maxAcceleration: 20
-  maxAirAcceleration: 1
+  maxAcceleration: 100
+  maxAirAcceleration: 0
   maxSpeed: 10
   jumpHeight: 2
   maxAirJumps: 0
+  maxGroundAngle: 40
 --- !u!96 &406421778
 TrailRenderer:
   serializedVersion: 2
@@ -4469,7 +4474,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 45
+  m_RootOrder: 47
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &426676174
 GameObject:
@@ -4506,7 +4511,7 @@ Rigidbody:
   m_AngularDrag: 0.05
   m_UseGravity: 1
   m_IsKinematic: 0
-  m_Interpolate: 1
+  m_Interpolate: 0
   m_Constraints: 112
   m_CollisionDetection: 0
 --- !u!114 &426676176
@@ -4521,11 +4526,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a379f181959196247a4c14a76efa2281, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  maxAcceleration: 20
-  maxAirAcceleration: 1
+  maxAcceleration: 100
+  maxAirAcceleration: 0
   maxSpeed: 10
   jumpHeight: 2
   maxAirJumps: 0
+  maxGroundAngle: 40
 --- !u!96 &426676177
 TrailRenderer:
   serializedVersion: 2
@@ -5065,7 +5071,7 @@ Mesh:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: pb_Mesh-28284
+  m_Name: pb_Mesh48518
   serializedVersion: 10
   m_SubMeshes:
   - serializedVersion: 2
@@ -5258,7 +5264,7 @@ Rigidbody:
   m_AngularDrag: 0.05
   m_UseGravity: 1
   m_IsKinematic: 0
-  m_Interpolate: 1
+  m_Interpolate: 0
   m_Constraints: 112
   m_CollisionDetection: 0
 --- !u!114 &551737804
@@ -5273,11 +5279,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a379f181959196247a4c14a76efa2281, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  maxAcceleration: 20
-  maxAirAcceleration: 1
+  maxAcceleration: 100
+  maxAirAcceleration: 0
   maxSpeed: 10
   jumpHeight: 2
   maxAirJumps: 0
+  maxGroundAngle: 40
 --- !u!96 &551737805
 TrailRenderer:
   serializedVersion: 2
@@ -5450,7 +5457,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 32
+  m_RootOrder: 36
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!43 &557851100
 Mesh:
@@ -5458,7 +5465,7 @@ Mesh:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: pb_Mesh-29026
+  m_Name: pb_Mesh47926
   serializedVersion: 10
   m_SubMeshes:
   - serializedVersion: 2
@@ -5981,7 +5988,7 @@ Mesh:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: pb_Mesh-28586
+  m_Name: pb_Mesh47996
   serializedVersion: 10
   m_SubMeshes:
   - serializedVersion: 2
@@ -6174,7 +6181,7 @@ Rigidbody:
   m_AngularDrag: 0.05
   m_UseGravity: 1
   m_IsKinematic: 0
-  m_Interpolate: 1
+  m_Interpolate: 0
   m_Constraints: 112
   m_CollisionDetection: 0
 --- !u!114 &647651608
@@ -6189,11 +6196,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a379f181959196247a4c14a76efa2281, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  maxAcceleration: 20
-  maxAirAcceleration: 1
+  maxAcceleration: 100
+  maxAirAcceleration: 0
   maxSpeed: 10
   jumpHeight: 2
   maxAirJumps: 0
+  maxGroundAngle: 40
 --- !u!96 &647651609
 TrailRenderer:
   serializedVersion: 2
@@ -6366,7 +6374,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 37
+  m_RootOrder: 42
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!43 &663893743
 Mesh:
@@ -6374,7 +6382,7 @@ Mesh:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: pb_Mesh-28590
+  m_Name: pb_Mesh48160
   serializedVersion: 10
   m_SubMeshes:
   - serializedVersion: 2
@@ -6990,7 +6998,7 @@ Mesh:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: pb_Mesh-28286
+  m_Name: pb_Mesh48090
   serializedVersion: 10
   m_SubMeshes:
   - serializedVersion: 2
@@ -7513,7 +7521,7 @@ Mesh:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: pb_Mesh-79454
+  m_Name: pb_Mesh48410
   serializedVersion: 10
   m_SubMeshes:
   - serializedVersion: 2
@@ -7706,7 +7714,7 @@ Rigidbody:
   m_AngularDrag: 0.05
   m_UseGravity: 1
   m_IsKinematic: 0
-  m_Interpolate: 1
+  m_Interpolate: 0
   m_Constraints: 112
   m_CollisionDetection: 0
 --- !u!114 &808412773
@@ -7721,11 +7729,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a379f181959196247a4c14a76efa2281, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  maxAcceleration: 20
-  maxAirAcceleration: 1
+  maxAcceleration: 100
+  maxAirAcceleration: 0
   maxSpeed: 10
   jumpHeight: 2
   maxAirJumps: 0
+  maxGroundAngle: 40
 --- !u!96 &808412774
 TrailRenderer:
   serializedVersion: 2
@@ -7898,7 +7907,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 35
+  m_RootOrder: 38
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &858038564
 GameObject:
@@ -7935,7 +7944,7 @@ Rigidbody:
   m_AngularDrag: 0.05
   m_UseGravity: 1
   m_IsKinematic: 0
-  m_Interpolate: 1
+  m_Interpolate: 0
   m_Constraints: 112
   m_CollisionDetection: 0
 --- !u!114 &858038566
@@ -7950,11 +7959,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a379f181959196247a4c14a76efa2281, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  maxAcceleration: 20
-  maxAirAcceleration: 1
+  maxAcceleration: 100
+  maxAirAcceleration: 0
   maxSpeed: 10
   jumpHeight: 2
   maxAirJumps: 0
+  maxGroundAngle: 40
 --- !u!96 &858038567
 TrailRenderer:
   serializedVersion: 2
@@ -8127,7 +8137,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 47
+  m_RootOrder: 44
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &862312613
 GameObject:
@@ -8164,7 +8174,7 @@ Rigidbody:
   m_AngularDrag: 0.05
   m_UseGravity: 1
   m_IsKinematic: 0
-  m_Interpolate: 1
+  m_Interpolate: 0
   m_Constraints: 112
   m_CollisionDetection: 0
 --- !u!114 &862312615
@@ -8179,11 +8189,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a379f181959196247a4c14a76efa2281, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  maxAcceleration: 20
-  maxAirAcceleration: 1
+  maxAcceleration: 100
+  maxAirAcceleration: 0
   maxSpeed: 10
   jumpHeight: 2
   maxAirJumps: 0
+  maxGroundAngle: 40
 --- !u!96 &862312616
 TrailRenderer:
   serializedVersion: 2
@@ -8356,7 +8367,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 44
+  m_RootOrder: 43
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &908645378
 GameObject:
@@ -8393,7 +8404,7 @@ Rigidbody:
   m_AngularDrag: 0.05
   m_UseGravity: 1
   m_IsKinematic: 0
-  m_Interpolate: 1
+  m_Interpolate: 0
   m_Constraints: 112
   m_CollisionDetection: 0
 --- !u!114 &908645380
@@ -8408,11 +8419,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a379f181959196247a4c14a76efa2281, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  maxAcceleration: 20
-  maxAirAcceleration: 1
+  maxAcceleration: 100
+  maxAirAcceleration: 0
   maxSpeed: 10
   jumpHeight: 2
   maxAirJumps: 0
+  maxGroundAngle: 40
 --- !u!96 &908645381
 TrailRenderer:
   serializedVersion: 2
@@ -8585,7 +8597,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 38
+  m_RootOrder: 40
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &963194225
 GameObject:
@@ -8676,7 +8688,7 @@ Mesh:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: pb_Mesh-22978
+  m_Name: pb_Mesh48382
   serializedVersion: 10
   m_SubMeshes:
   - serializedVersion: 2
@@ -9294,7 +9306,7 @@ Mesh:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: pb_Mesh-37042
+  m_Name: pb_Mesh48122
   serializedVersion: 10
   m_SubMeshes:
   - serializedVersion: 2
@@ -9582,7 +9594,7 @@ Rigidbody:
   m_AngularDrag: 0.05
   m_UseGravity: 1
   m_IsKinematic: 0
-  m_Interpolate: 1
+  m_Interpolate: 0
   m_Constraints: 112
   m_CollisionDetection: 0
 --- !u!114 &1106243867
@@ -9597,11 +9609,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a379f181959196247a4c14a76efa2281, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  maxAcceleration: 20
-  maxAirAcceleration: 1
+  maxAcceleration: 100
+  maxAirAcceleration: 0
   maxSpeed: 10
   jumpHeight: 2
   maxAirJumps: 0
+  maxGroundAngle: 40
 --- !u!96 &1106243868
 TrailRenderer:
   serializedVersion: 2
@@ -9811,7 +9824,7 @@ Rigidbody:
   m_AngularDrag: 0.05
   m_UseGravity: 1
   m_IsKinematic: 0
-  m_Interpolate: 1
+  m_Interpolate: 0
   m_Constraints: 112
   m_CollisionDetection: 0
 --- !u!114 &1156303860
@@ -9826,11 +9839,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a379f181959196247a4c14a76efa2281, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  maxAcceleration: 20
-  maxAirAcceleration: 1
+  maxAcceleration: 100
+  maxAirAcceleration: 0
   maxSpeed: 10
   jumpHeight: 2
   maxAirJumps: 0
+  maxGroundAngle: 40
 --- !u!96 &1156303861
 TrailRenderer:
   serializedVersion: 2
@@ -10003,7 +10017,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 36
+  m_RootOrder: 37
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1182052244
 GameObject:
@@ -11088,7 +11102,7 @@ Mesh:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: pb_Mesh-81744
+  m_Name: pb_Mesh47982
   serializedVersion: 10
   m_SubMeshes:
   - serializedVersion: 2
@@ -11281,7 +11295,7 @@ Rigidbody:
   m_AngularDrag: 0.05
   m_UseGravity: 1
   m_IsKinematic: 0
-  m_Interpolate: 1
+  m_Interpolate: 0
   m_Constraints: 112
   m_CollisionDetection: 0
 --- !u!114 &1296315420
@@ -11296,11 +11310,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a379f181959196247a4c14a76efa2281, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  maxAcceleration: 20
-  maxAirAcceleration: 1
+  maxAcceleration: 100
+  maxAirAcceleration: 0
   maxSpeed: 10
   jumpHeight: 2
   maxAirJumps: 0
+  maxGroundAngle: 40
 --- !u!96 &1296315421
 TrailRenderer:
   serializedVersion: 2
@@ -11473,7 +11488,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 33
+  m_RootOrder: 35
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1333427206
 GameObject:
@@ -11869,7 +11884,7 @@ Rigidbody:
   m_AngularDrag: 0.05
   m_UseGravity: 1
   m_IsKinematic: 0
-  m_Interpolate: 1
+  m_Interpolate: 0
   m_Constraints: 112
   m_CollisionDetection: 0
 --- !u!114 &1356042650
@@ -11884,11 +11899,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a379f181959196247a4c14a76efa2281, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  maxAcceleration: 20
-  maxAirAcceleration: 1
+  maxAcceleration: 100
+  maxAirAcceleration: 0
   maxSpeed: 10
   jumpHeight: 2
   maxAirJumps: 0
+  maxGroundAngle: 40
 --- !u!96 &1356042651
 TrailRenderer:
   serializedVersion: 2
@@ -12061,7 +12077,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 31
+  m_RootOrder: 34
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1405478922
 GameObject:
@@ -12787,7 +12803,7 @@ Mesh:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: pb_Mesh-37766
+  m_Name: pb_Mesh48466
   serializedVersion: 10
   m_SubMeshes:
   - serializedVersion: 2
@@ -12980,7 +12996,7 @@ Rigidbody:
   m_AngularDrag: 0.05
   m_UseGravity: 1
   m_IsKinematic: 0
-  m_Interpolate: 1
+  m_Interpolate: 0
   m_Constraints: 112
   m_CollisionDetection: 0
 --- !u!114 &1440320475
@@ -12995,11 +13011,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a379f181959196247a4c14a76efa2281, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  maxAcceleration: 20
-  maxAirAcceleration: 1
+  maxAcceleration: 100
+  maxAirAcceleration: 0
   maxSpeed: 10
   jumpHeight: 2
   maxAirJumps: 0
+  maxGroundAngle: 40
 --- !u!96 &1440320476
 TrailRenderer:
   serializedVersion: 2
@@ -13172,7 +13189,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 29
+  m_RootOrder: 31
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!43 &1445129302
 Mesh:
@@ -13180,7 +13197,7 @@ Mesh:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: pb_Mesh-28592
+  m_Name: pb_Mesh47956
   serializedVersion: 10
   m_SubMeshes:
   - serializedVersion: 2
@@ -14577,7 +14594,7 @@ Mesh:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: pb_Mesh-27946
+  m_Name: pb_Mesh48352
   serializedVersion: 10
   m_SubMeshes:
   - serializedVersion: 2
@@ -14741,7 +14758,7 @@ Mesh:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: pb_Mesh-37768
+  m_Name: pb_Mesh48506
   serializedVersion: 10
   m_SubMeshes:
   - serializedVersion: 2
@@ -15747,7 +15764,7 @@ Rigidbody:
   m_AngularDrag: 0.05
   m_UseGravity: 1
   m_IsKinematic: 0
-  m_Interpolate: 1
+  m_Interpolate: 0
   m_Constraints: 112
   m_CollisionDetection: 0
 --- !u!114 &2013095377
@@ -15762,11 +15779,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a379f181959196247a4c14a76efa2281, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  maxAcceleration: 20
-  maxAirAcceleration: 1
+  maxAcceleration: 100
+  maxAirAcceleration: 0
   maxSpeed: 10
   jumpHeight: 2
   maxAirJumps: 0
+  maxGroundAngle: 40
 --- !u!96 &2013095378
 TrailRenderer:
   serializedVersion: 2
@@ -15939,7 +15957,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 40
+  m_RootOrder: 32
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &2021559994
 GameObject:
@@ -15976,7 +15994,7 @@ Rigidbody:
   m_AngularDrag: 0.05
   m_UseGravity: 1
   m_IsKinematic: 0
-  m_Interpolate: 1
+  m_Interpolate: 0
   m_Constraints: 112
   m_CollisionDetection: 0
 --- !u!114 &2021559996
@@ -15991,11 +16009,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a379f181959196247a4c14a76efa2281, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  maxAcceleration: 20
-  maxAirAcceleration: 1
+  maxAcceleration: 100
+  maxAirAcceleration: 0
   maxSpeed: 10
   jumpHeight: 2
   maxAirJumps: 0
+  maxGroundAngle: 40
 --- !u!96 &2021559997
 TrailRenderer:
   serializedVersion: 2
@@ -16168,7 +16187,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 43
+  m_RootOrder: 33
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &2034666242
 GameObject:
@@ -16205,7 +16224,7 @@ Rigidbody:
   m_AngularDrag: 0.05
   m_UseGravity: 1
   m_IsKinematic: 0
-  m_Interpolate: 1
+  m_Interpolate: 0
   m_Constraints: 112
   m_CollisionDetection: 0
 --- !u!114 &2034666244
@@ -16220,11 +16239,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a379f181959196247a4c14a76efa2281, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  maxAcceleration: 20
-  maxAirAcceleration: 1
+  maxAcceleration: 100
+  maxAirAcceleration: 0
   maxSpeed: 10
   jumpHeight: 2
   maxAirJumps: 0
+  maxGroundAngle: 40
 --- !u!96 &2034666245
 TrailRenderer:
   serializedVersion: 2
@@ -16434,7 +16454,7 @@ Rigidbody:
   m_AngularDrag: 0.05
   m_UseGravity: 1
   m_IsKinematic: 0
-  m_Interpolate: 1
+  m_Interpolate: 0
   m_Constraints: 112
   m_CollisionDetection: 0
 --- !u!114 &2049323842
@@ -16449,11 +16469,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a379f181959196247a4c14a76efa2281, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  maxAcceleration: 20
-  maxAirAcceleration: 1
+  maxAcceleration: 100
+  maxAirAcceleration: 0
   maxSpeed: 10
   jumpHeight: 2
   maxAirJumps: 0
+  maxGroundAngle: 40
 --- !u!96 &2049323843
 TrailRenderer:
   serializedVersion: 2
@@ -16626,5 +16647,5 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 42
+  m_RootOrder: 29
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
