@@ -23,6 +23,8 @@ public class MovingSphere : MonoBehaviour
     float maxGroundAngle = 25f;
 
     Vector3 velocity, desiredVelocity;
+    //Saves thesurface's normal that is in contact with
+    Vector3 contactNormal;
     int jumpPhase;
     float minGroundDotProduct;
 
@@ -88,6 +90,10 @@ public class MovingSphere : MonoBehaviour
         {
             jumpPhase = 0;
         }
+        else
+        {
+            contactNormal = Vector3.up;
+        }
     }
 
     void Jump()
@@ -97,16 +103,19 @@ public class MovingSphere : MonoBehaviour
             jumpPhase += 1;
             //Pressing jump quicky stacks too much upwards velocity
             float jumpSpeed = Mathf.Sqrt(-2f * Physics.gravity.y * jumpHeight);
-            if (velocity.y > 0f)
+
+            //Get upward component of saved normal
+            float alignedSpeed = Vector3.Dot(velocity, contactNormal);
+            if (alignedSpeed > 0f)
             {
                 //if there is an upward force, substract it from jump speed
                 //before adding it to velocity, so it wont exceed the limit
-                jumpSpeed = Mathf.Max(jumpSpeed - velocity.y, 0f);
+                jumpSpeed = Mathf.Max(jumpSpeed - alignedSpeed, 0f);
                 //with max( ) we prevent a jump from slow it down so it wont be negative
             }
 
             //Using gravity to calculate jump force
-            velocity.y += jumpSpeed;
+            velocity += contactNormal * jumpSpeed;
         }
     }
 
@@ -125,7 +134,12 @@ public class MovingSphere : MonoBehaviour
         for (int i = 0; i < collision.contactCount; i++)
         {
             Vector3 normal = collision.GetContact(i).normal;
-            isGrounded |= normal.y >= minGroundDotProduct;
+            if (normal.y >= minGroundDotProduct)
+            {
+                isGrounded = true;
+                //save surfaces's normal
+                contactNormal = normal;
+            }
         }
     }
 }
