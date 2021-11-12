@@ -31,7 +31,9 @@ public class MovingSphere : MonoBehaviour
     Rigidbody body;
 
     bool desiredJump;
-    bool isGrounded;
+    //bool isGrounded;
+    int groundContactCount;
+    bool IsGrounded => groundContactCount > 0;
 
     private void Awake()
     {
@@ -51,6 +53,10 @@ public class MovingSphere : MonoBehaviour
 
         //Setting Desired Velocity
         desiredVelocity = new Vector3(playerInput.x, 0f, playerInput.y) * maxSpeed;
+
+        GetComponent<Renderer>().material.SetColor(
+            "_Color", Color.white * (groundContactCount * 0.25f)
+        );
     }
     private void FixedUpdate()
     {
@@ -68,22 +74,21 @@ public class MovingSphere : MonoBehaviour
 
         body.velocity = velocity;
 
-        isGrounded = false;
+        ClearState();
 
-    }
-
-    private void OnValidate()
-    {
-        minGroundDotProduct = Mathf.Cos(maxGroundAngle * Mathf.Deg2Rad);
     }
 
     private void UpdateState()
     {
 
         velocity = body.velocity;
-        if (isGrounded)
+        if (IsGrounded)
         {
             jumpPhase = 0;
+            if (groundContactCount >1)
+            {
+                contactNormal.Normalize();
+            }
         }
         else
         {
@@ -91,9 +96,22 @@ public class MovingSphere : MonoBehaviour
         }
     }
 
+    private void ClearState()
+    {
+        groundContactCount = 0;
+        contactNormal = Vector3.zero;
+    }
+
+    private void OnValidate()
+    {
+        minGroundDotProduct = Mathf.Cos(maxGroundAngle * Mathf.Deg2Rad);
+    }
+
+   
+
     void Jump()
     {
-        if (isGrounded || jumpPhase < maxAirJumps)
+        if (IsGrounded || jumpPhase < maxAirJumps)
         {
             jumpPhase += 1;
             //Pressing jump quicky stacks too much upwards velocity
@@ -131,9 +149,10 @@ public class MovingSphere : MonoBehaviour
             Vector3 normal = collision.GetContact(i).normal;
             if (normal.y >= minGroundDotProduct)
             {
-                isGrounded = true;
+                groundContactCount += 1;
                 //save surfaces's normal
-                contactNormal = normal;
+                //and acummulatie them if ther is more than one in contact
+                contactNormal += normal;
             }
         }
     }
@@ -149,7 +168,7 @@ public class MovingSphere : MonoBehaviour
         float currentZ = Vector3.Dot(velocity, zAxis);
 
         //make air movement different from ground movement
-        float acceleration = isGrounded ? maxAcceleration : maxAirAcceleration;
+        float acceleration = IsGrounded ? maxAcceleration : maxAirAcceleration;
         //find maximum speed change this update
         float maxSpeedChange = acceleration * Time.deltaTime;
 
