@@ -39,9 +39,9 @@ public class MovingSphere : MonoBehaviour
         velocity.z =
             Mathf.MoveTowards(velocity.z, desiredVelocity.z, maxSpeedChange);
 
-
-
         body.velocity = velocity;
+
+
     }
 
 }
