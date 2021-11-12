@@ -64,10 +64,19 @@ public class MovingSphere : MonoBehaviour
         Vector3 displacement = velocity * Time.fixedDeltaTime;
 
         Vector3 newPosition = transform.localPosition + displacement;
-        //Constraining position (looks laggy becuase inputs are being missed)
+        //Constraining position 
         if (!allowedArea.Contains(new Vector2(newPosition.x, newPosition.z)))
         {
-            newPosition = transform.localPosition;
+            //looks laggy becuase inputs are being missed
+            ///newPosition = transform.localPosition;
+
+            //clamping solves that issue, but now balls sticks to the edge
+            //because its keeping velocity in the edge dierection
+            newPosition.x =
+                Mathf.Clamp(newPosition.x, allowedArea.xMin, allowedArea.xMax);
+            newPosition.z =
+                Mathf.Clamp(newPosition.z, allowedArea.yMin, allowedArea.yMax);
+
 
         }
         transform.localPosition = newPosition;
