@@ -5,7 +5,12 @@ using UnityEngine;
 
 
 public class MovingSphere : MonoBehaviour
-{ 
+{
+
+    [SerializeField, Range(0f, 100f)]
+    float maxSpeed = 10f;
+
+    Vector3 velocity;
 
     // Start is called before the first frame update
     void Start()
@@ -34,8 +39,14 @@ public class MovingSphere : MonoBehaviour
         ///Vector3 displacement = new Vector3(playerInput.x, 0f, playerInput.y);
 
         //Add Velocity for precise control
-        Vector3 velocity = new Vector3(playerInput.x, 0f, playerInput.y);
+        /**Vector3 velocity = new Vector3(playerInput.x, 0f, playerInput.y) * maxSpeed;
+        Vector3 displacement = velocity * Time.fixedDeltaTime;*/
+
+        //Adding Accelaration
+        Vector3 accelaration = new Vector3(playerInput.x, 0f, playerInput.y) * maxSpeed;
+        velocity += accelaration * Time.fixedDeltaTime;
         Vector3 displacement = velocity * Time.fixedDeltaTime;
+
         transform.localPosition += displacement;
 
     }
