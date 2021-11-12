@@ -22,7 +22,13 @@ public class MovingSphere : MonoBehaviour
         Vector2 playerInput;
         playerInput.x = Input.GetAxis("Horizontal");
         playerInput.y = Input.GetAxis("Vertical");
-        playerInput.Normalize();
+
+        //Normalizing to behave the same with keys and joystick
+        ///playerInput.Normalize();
+
+        //Normalizing limits the position 
+        playerInput = Vector2.ClampMagnitude(playerInput, 1f);
+
         transform.localPosition = new Vector3(playerInput.x, 0.5f, playerInput.y);
 
     }
