@@ -12,11 +12,14 @@ public class MovingSphere : MonoBehaviour
     [SerializeField, Range(0f, 100f)]
     float maxSpeed = 10f;
 
-    public Vector3 velocity, desiredVelocity;
+    [SerializeField, Range(0f, 10f)]
+    float jumpHeight = 2f;
+
+    Vector3 velocity, desiredVelocity;
 
     Rigidbody body;
 
-    public bool desiredJump;
+    bool desiredJump;
 
     private void Awake()
     {
@@ -25,11 +28,7 @@ public class MovingSphere : MonoBehaviour
 
     private void Update()
     {
-        if (Input.GetButtonDown("Jump"))
-        {
-            Debug.Log("aa");
-        }
-
+    
         desiredJump |= Input.GetButtonDown("Jump");
 
         Vector2 playerInput;
@@ -66,7 +65,8 @@ public class MovingSphere : MonoBehaviour
 
     void Jump()
     {
-        velocity.y += 5f;
+        //Using gravity to calculate jump force
+        velocity.y += Mathf.Sqrt(-2f * Physics.gravity.y * jumpHeight);
     }
 }
 
