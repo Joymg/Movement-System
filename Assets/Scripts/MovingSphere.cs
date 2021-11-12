@@ -6,6 +6,7 @@ using UnityEngine;
 
 public class MovingSphere : MonoBehaviour
 { 
+
     // Start is called before the first frame update
     void Start()
     {
@@ -30,7 +31,11 @@ public class MovingSphere : MonoBehaviour
         playerInput = Vector2.ClampMagnitude(playerInput, 1f);
 
         //Displace instead of teleporting
-        Vector3 displacement = new Vector3(playerInput.x, 0f, playerInput.y);
+        ///Vector3 displacement = new Vector3(playerInput.x, 0f, playerInput.y);
+
+        //Add Velocity for precise control
+        Vector3 velocity = new Vector3(playerInput.x, 0f, playerInput.y);
+        Vector3 displacement = velocity * Time.fixedDeltaTime;
         transform.localPosition += displacement;
 
     }
