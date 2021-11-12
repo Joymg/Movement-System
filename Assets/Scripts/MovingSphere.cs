@@ -7,111 +7,183 @@ using UnityEngine;
 public class MovingSphere : MonoBehaviour
 {
     [SerializeField, Range(0f, 100f)]
-    float maxAcceleration = 10f;
+    float maxAcceleration = 10f, maxAirAcceleration = 1f;
 
     [SerializeField, Range(0f, 100f)]
     float maxSpeed = 10f;
 
-    [SerializeField]
-    Rect allowedArea = new Rect(-5f, -5f, 10f, 10f);
+    [SerializeField, Range(0f, 10f)]
+    float jumpHeight = 2f;
 
-    [SerializeField, Range(0f, 1f)]
-	float bounciness = 0.5f;
+    [SerializeField, Range(0, 5)]
+    int maxAirJumps = 0;
 
-    Vector3 velocity;
+    //Setting custom groundAngle
+    [SerializeField, Range(0f, 90f)]
+    float maxGroundAngle = 25f;
 
-    // Start is called before the first frame update
-    void Start()
+    Vector3 velocity, desiredVelocity;
+    //Saves thesurface's normal that is in contact with
+    Vector3 contactNormal;
+    int jumpPhase;
+    float minGroundDotProduct;
+
+    Rigidbody body;
+
+    bool desiredJump;
+    //bool isGrounded;
+    int groundContactCount;
+    bool IsGrounded => groundContactCount > 0;
+
+    private void Awake()
     {
-        
+        body = GetComponent<Rigidbody>();
+        OnValidate();
     }
 
-    // Update is called once per frame
-    void Update()
+    private void Update()
     {
+    
+        desiredJump |= Input.GetButtonDown("Jump");
 
-    }
-    private void FixedUpdate()
-    { 
         Vector2 playerInput;
         playerInput.x = Input.GetAxis("Horizontal");
         playerInput.y = Input.GetAxis("Vertical");
-
-        //Normalizing to behave the same with keys and joystick
-        ///playerInput.Normalize();
-
-        //Normalizing limits the position 
         playerInput = Vector2.ClampMagnitude(playerInput, 1f);
 
-        //Displace instead of teleporting
-        ///Vector3 displacement = new Vector3(playerInput.x, 0f, playerInput.y);
-
-        //Add Velocity for precise control
-        /**Vector3 velocity = new Vector3(playerInput.x, 0f, playerInput.y) * maxSpeed;
-        Vector3 displacement = velocity * Time.fixedDeltaTime;*/
-
-        //Adding Accelaration
-        /**Vector3 accelaration = new Vector3(playerInput.x, 0f, playerInput.y) * maxSpeed;
-        velocity += accelaration * Time.fixedDeltaTime;
-        Vector3 displacement = velocity * Time.fixedDeltaTime;*/
-
         //Setting Desired Velocity
-        Vector3 desiredVelocity = new Vector3(playerInput.x, 0f, playerInput.y) * maxSpeed;
-            //find maximum speed change this update
-        float maxSpeedChange = maxAcceleration * Time.fixedDeltaTime;
-        velocity.x =
-            Mathf.MoveTowards(velocity.x, desiredVelocity.x, maxSpeedChange);
-        velocity.z =
-            Mathf.MoveTowards(velocity.z, desiredVelocity.z, maxSpeedChange);
+        desiredVelocity = new Vector3(playerInput.x, 0f, playerInput.y) * maxSpeed;
 
-        Vector3 displacement = velocity * Time.fixedDeltaTime;
+        GetComponent<Renderer>().material.SetColor(
+            "_Color", Color.white * (groundContactCount * 0.25f)
+        );
+    }
+    private void FixedUpdate()
+    {
 
-        Vector3 newPosition = transform.localPosition + displacement;
-        //Constraining position 
-        if (!allowedArea.Contains(new Vector2(newPosition.x, newPosition.z)))
+        UpdateState();
+
+        AdjustVelocity();
+        
+
+        if (desiredJump)
         {
-            //looks laggy becuase inputs are being missed
-            ///newPosition = transform.localPosition;
+            desiredJump = false;
+            Jump();
+        }
 
-            //clamping solves that issue, but now balls sticks to the edge
-            //because its keeping velocity in the edge dierection
-            /**newPosition.x =
-                Mathf.Clamp(newPosition.x, allowedArea.xMin, allowedArea.xMax);
-            newPosition.z =
-                Mathf.Clamp(newPosition.z, allowedArea.yMin, allowedArea.yMax);*/
+        body.velocity = velocity;
 
+        ClearState();
 
-            if (newPosition.x < allowedArea.xMin)
+    }
+
+    private void UpdateState()
+    {
+
+        velocity = body.velocity;
+        if (IsGrounded)
+        {
+            jumpPhase = 0;
+            if (groundContactCount >1)
             {
-                newPosition.x = allowedArea.xMin;
-                //velocity.x = 0f;
-                //Bouncing
-                velocity.x = -velocity.x;
-            }
-            else if (newPosition.x > allowedArea.xMax)
-            {
-                newPosition.x = allowedArea.xMax;
-                //velocity.x = 0f;
-                //Bouncing
-                velocity.x = -velocity.x;
-            }
-            if (newPosition.z < allowedArea.yMin)
-            {
-                newPosition.z = allowedArea.yMin;
-                //velocity.z = 0f;
-                //Bouncing
-                velocity.z = -velocity.z;
-            }
-            else if (newPosition.z > allowedArea.yMax)
-            {
-                newPosition.z = allowedArea.yMax;
-                //velocity.z = 0f;
-                //Bouncing
-                velocity.z = -velocity.z;
+                contactNormal.Normalize();
             }
         }
-        transform.localPosition = newPosition;
+        else
+        {
+            contactNormal = Vector3.up;
+        }
+    }
 
+    private void ClearState()
+    {
+        groundContactCount = 0;
+        contactNormal = Vector3.zero;
+    }
+
+    private void OnValidate()
+    {
+        minGroundDotProduct = Mathf.Cos(maxGroundAngle * Mathf.Deg2Rad);
+    }
+
+   
+
+    void Jump()
+    {
+        if (IsGrounded || jumpPhase < maxAirJumps)
+        {
+            jumpPhase += 1;
+            //Pressing jump quicky stacks too much upwards velocity
+            float jumpSpeed = Mathf.Sqrt(-2f * Physics.gravity.y * jumpHeight);
+
+            //Get upward component of saved normal
+            float alignedSpeed = Vector3.Dot(velocity, contactNormal);
+            if (alignedSpeed > 0f)
+            {
+                //if there is an upward force, substract it from jump speed
+                //before adding it to velocity, so it wont exceed the limit
+                jumpSpeed = Mathf.Max(jumpSpeed - alignedSpeed, 0f);
+                //with max( ) we prevent a jump from slow it down so it wont be negative
+            }
+
+            //Using gravity to calculate jump force
+            velocity += contactNormal * jumpSpeed;
+        }
+    }
+
+    private void OnCollisionEnter(Collision collision)
+    {
+        EvaluateCollision(collision);
+    }
+
+    private void OnCollisionStay(Collision collision)
+    {
+        EvaluateCollision(collision);
+    }
+
+    private void EvaluateCollision(Collision collision)
+    {
+        for (int i = 0; i < collision.contactCount; i++)
+        {
+            Vector3 normal = collision.GetContact(i).normal;
+            if (normal.y >= minGroundDotProduct)
+            {
+                groundContactCount += 1;
+                //save surfaces's normal
+                //and acummulatie them if ther is more than one in contact
+                contactNormal += normal;
+            }
+        }
+    }
+
+    void AdjustVelocity()
+    {
+        //Determine projected axes by projecting vectors on contact plane
+        Vector3 xAxis = ProjectOnContactPlane(Vector3.right).normalized;
+        Vector3 zAxis = ProjectOnContactPlane(Vector3.forward).normalized;
+
+        //project currentvelocity on both vectors to get relatives speeds
+        float currentX = Vector3.Dot(velocity, xAxis);
+        float currentZ = Vector3.Dot(velocity, zAxis);
+
+        //make air movement different from ground movement
+        float acceleration = IsGrounded ? maxAcceleration : maxAirAcceleration;
+        //find maximum speed change this update
+        float maxSpeedChange = acceleration * Time.deltaTime;
+
+        //calculate new speeds relatives to ground
+        float newX =
+            Mathf.MoveTowards(currentX, desiredVelocity.x, maxSpeedChange);
+        float newZ =
+            Mathf.MoveTowards(currentZ, desiredVelocity.z, maxSpeedChange);
+
+        //adjust velocity bya dding differences between new and old speeds
+        velocity += xAxis * (newX - currentX) + zAxis * (newZ - currentZ);
+    }
+    private Vector3 ProjectOnContactPlane(Vector3 vector)
+    {
+        return vector - contactNormal * Vector3.Dot(vector, contactNormal);
     }
 
 }
