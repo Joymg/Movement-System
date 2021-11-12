@@ -6,6 +6,8 @@ using UnityEngine;
 
 public class MovingSphere : MonoBehaviour
 {
+    [SerializeField, Range(0f, 100f)]
+    float maxAcceleration = 10f;
 
     [SerializeField, Range(0f, 100f)]
     float maxSpeed = 10f;
@@ -43,11 +45,21 @@ public class MovingSphere : MonoBehaviour
         Vector3 displacement = velocity * Time.fixedDeltaTime;*/
 
         //Adding Accelaration
-        Vector3 accelaration = new Vector3(playerInput.x, 0f, playerInput.y) * maxSpeed;
+        /**Vector3 accelaration = new Vector3(playerInput.x, 0f, playerInput.y) * maxSpeed;
         velocity += accelaration * Time.fixedDeltaTime;
-        Vector3 displacement = velocity * Time.fixedDeltaTime;
+        Vector3 displacement = velocity * Time.fixedDeltaTime;*/
 
-        transform.localPosition += displacement;
+        //Setting Desired Velocity
+        Vector3 desiredVelocity = new Vector3(playerInput.x, 0f, playerInput.y) * maxSpeed;
+            //find maximum speed change this update
+        float maxSpeedChange = maxAcceleration * Time.fixedDeltaTime;
+        velocity.x =
+            Mathf.MoveTowards(velocity.x, desiredVelocity.x, maxSpeedChange);
+        velocity.z =
+            Mathf.MoveTowards(velocity.z, desiredVelocity.z, maxSpeedChange);
+
+        Vector3 displacement = velocity * Time.fixedDeltaTime; 
+         transform.localPosition += displacement;
 
     }
 
