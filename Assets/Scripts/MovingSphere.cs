@@ -72,12 +72,32 @@ public class MovingSphere : MonoBehaviour
 
             //clamping solves that issue, but now balls sticks to the edge
             //because its keeping velocity in the edge dierection
-            newPosition.x =
+            /**newPosition.x =
                 Mathf.Clamp(newPosition.x, allowedArea.xMin, allowedArea.xMax);
             newPosition.z =
-                Mathf.Clamp(newPosition.z, allowedArea.yMin, allowedArea.yMax);
+                Mathf.Clamp(newPosition.z, allowedArea.yMin, allowedArea.yMax);*/
 
 
+            if (newPosition.x < allowedArea.xMin)
+            {
+                newPosition.x = allowedArea.xMin;
+                velocity.x = 0f;
+            }
+            else if (newPosition.x > allowedArea.xMax)
+            {
+                newPosition.x = allowedArea.xMax;
+                velocity.x = 0f;
+            }
+            if (newPosition.z < allowedArea.yMin)
+            {
+                newPosition.z = allowedArea.yMin;
+                velocity.z = 0f;
+            }
+            else if (newPosition.z > allowedArea.yMax)
+            {
+                newPosition.z = allowedArea.yMax;
+                velocity.z = 0f;
+            }
         }
         transform.localPosition = newPosition;
 
