@@ -29,7 +29,9 @@ public class MovingSphere : MonoBehaviour
         //Normalizing limits the position 
         playerInput = Vector2.ClampMagnitude(playerInput, 1f);
 
-        transform.localPosition = new Vector3(playerInput.x, 0.5f, playerInput.y);
+        //Displace instead of teleporting
+        Vector3 displacement = new Vector3(playerInput.x, 0f, playerInput.y);
+        transform.localPosition += displacement;
 
     }
 
