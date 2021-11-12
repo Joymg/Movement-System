@@ -82,8 +82,18 @@ public class MovingSphere : MonoBehaviour
         if (isGrounded || jumpPhase < maxAirJumps)
         {
             jumpPhase += 1;
+            //Pressing jump quicky stacks too much upwards velocity
+            float jumpSpeed = Mathf.Sqrt(-2f * Physics.gravity.y * jumpHeight);
+            if (velocity.y > 0f)
+            {
+                //if there is an upward force, substract it from jump speed
+                //before adding it to velocity, so it wont exceed the limit
+                jumpSpeed = Mathf.Max(jumpSpeed - velocity.y, 0f);
+                //with max( ) we prevent a jump from slow it down so it wont be negative
+            }
+
             //Using gravity to calculate jump force
-            velocity.y += Mathf.Sqrt(-2f * Physics.gravity.y * jumpHeight);
+            velocity.y += jumpSpeed;
         }
     }
 
