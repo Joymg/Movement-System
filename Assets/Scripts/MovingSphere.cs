@@ -36,6 +36,12 @@ public class MovingSphere : MonoBehaviour
     [SerializeField, Min(0f)]
     float probeDistance = 1f;
 
+    /// <summary>
+    /// Layer used to ignore collisions with some object at snapping
+    /// </summary>
+    [SerializeField]
+    LayerMask probeMask = -1;
+
     Vector3 velocity, desiredVelocity;
     /// <summary>
     /// Saves the surface's normal that is in contact with
@@ -179,7 +185,7 @@ public class MovingSphere : MonoBehaviour
         }
         //snapping will only be produced if there's ground below the sphere.
         //hit allows to check if the thing below the sphere counts as ground
-        if (!Physics.Raycast(body.position,Vector3.down, out RaycastHit hit, probeDistance))
+        if (!Physics.Raycast(body.position,Vector3.down, out RaycastHit hit, probeDistance, probeMask))
         {
             return false;
         }
