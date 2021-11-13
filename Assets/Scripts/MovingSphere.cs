@@ -55,9 +55,14 @@ public class MovingSphere : MonoBehaviour
     float minGroundDotProduct;
 
     /// <summary>
-    /// keeping tack of how many physic steps since the sphere was in ground
+    /// Keeps track of how many physic steps since the sphere was in ground
     /// </summary>
     int stepsSinceLastGrounded;
+
+    /// <summary>
+    /// Keeps track of how many physics steps since last jump
+    /// </summary>
+    int stepsSinceLastJump;
 
     Rigidbody body;
 
@@ -114,6 +119,8 @@ public class MovingSphere : MonoBehaviour
     private void UpdateState()
     {
         stepsSinceLastGrounded += 1;
+        //Snapping broke jump so anpping needs to be aborted right after jumping
+        stepsSinceLastJump += 1;
         velocity = body.velocity;
 
         //if not on the ground call SnapToground
@@ -149,6 +156,7 @@ public class MovingSphere : MonoBehaviour
     {
         if (IsGrounded || jumpPhase < maxAirJumps)
         {
+            stepsSinceLastJump = 0;
             jumpPhase += 1;
             //Pressing jump quicky stacks too much upwards velocity
             float jumpSpeed = Mathf.Sqrt(-2f * Physics.gravity.y * jumpHeight);
@@ -172,9 +180,12 @@ public class MovingSphere : MonoBehaviour
 
     bool SnapToGround()
     {
-        //we need to stick to the ground ritght when we lose connection with ground
-        //so if the sphere its been in the air for more than 1 step: abort
-        if (stepsSinceLastGrounded > 1)
+        //We need to stick to the ground ritght when we lose connection with ground
+        //so if the sphere its been in the air for more than 1 step: abort.
+
+        //If a jump is executed snapping is aborted, afeter jumping the sphere
+        //is considered grounded for a few seconds, so a small delay is added just in case
+        if (stepsSinceLastGrounded > 1 || stepsSinceLastJump <= 2)
         {
             return false;
         }
