@@ -150,6 +150,19 @@ public class MovingSphere : MonoBehaviour
         {
             return false;
         }
+        //snapping will only be produced if there's ground below the sphere.
+        //hit allows to check if the thing below the sphere counts as ground
+        if (!Physics.Raycast(body.position,Vector3.down, out RaycastHit hit))
+        {
+            return false;
+        }
+
+        //use collision's normal to check if its ground
+        if (hit.normal.y < minGroundDotProduct)
+        {
+            return false;
+        }
+
         return false;
     }
 
