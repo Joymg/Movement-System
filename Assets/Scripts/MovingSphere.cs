@@ -87,7 +87,9 @@ public class MovingSphere : MonoBehaviour
     {
         stepsSinceLastGrounded += 1;
         velocity = body.velocity;
-        if (IsGrounded)
+
+        //if not on the ground call SnapToground
+        if (IsGrounded || SnapToGround())
         {
             stepsSinceLastGrounded = 0;
             jumpPhase = 0;
@@ -136,6 +138,19 @@ public class MovingSphere : MonoBehaviour
             //Using gravity to calculate jump force
             velocity += contactNormal * jumpSpeed;
         }
+    }
+
+    //keeps the sphere stuck to the ground,only invoked if in the air
+
+    bool SnapToGround()
+    {
+        //we need to stick to the ground ritght when we lose connection with ground
+        //so if the sphere its been in the air for more than 1 step: abort
+        if (stepsSinceLastGrounded > 1)
+        {
+            return false;
+        }
+        return false;
     }
 
     private void OnCollisionEnter(Collision collision)
