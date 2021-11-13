@@ -18,28 +18,46 @@ public class MovingSphere : MonoBehaviour
     [SerializeField, Range(0, 5)]
     int maxAirJumps = 0;
 
-    //Setting custom groundAngle
+    /// <summary>
+    /// Setting custom groundAngle
+    /// </summary>
     [SerializeField, Range(0f, 90f)]
     float maxGroundAngle = 25f;
 
-    //max speed at which the sphere will snap to ground (shold be a bit higher than maxSpeed)
+    /// <summary>
+    /// Max speed at which the sphere will snap to ground (shold be a bit higher than maxSpeed)
+    /// </summary>
     [SerializeField, Range(0f, 100f)]
     float maxSnapSpeed = 100f;
 
+    /// <summary>
+    /// Max distance to the ground below for snap checking
+    /// </summary>
+    [SerializeField, Min(0f)]
+    float probeDistance = 1f;
+
     Vector3 velocity, desiredVelocity;
-    //Saves the surface's normal that is in contact with
+    /// <summary>
+    /// Saves the surface's normal that is in contact with
+    /// </summary>
     Vector3 contactNormal;
 
+    /// <summary>
+    /// Current jumps executed
+    /// </summary>
     int jumpPhase;
     float minGroundDotProduct;
-    //keeping tack of how many physic steps since the sphere was in ground
+
+    /// <summary>
+    /// keeping tack of how many physic steps since the sphere was in ground
+    /// </summary>
     int stepsSinceLastGrounded;
 
     Rigidbody body;
 
     bool desiredJump;
 
-    //bool isGrounded;
+
     int groundContactCount;
     bool IsGrounded => groundContactCount > 0;
 
@@ -161,7 +179,7 @@ public class MovingSphere : MonoBehaviour
         }
         //snapping will only be produced if there's ground below the sphere.
         //hit allows to check if the thing below the sphere counts as ground
-        if (!Physics.Raycast(body.position,Vector3.down, out RaycastHit hit))
+        if (!Physics.Raycast(body.position,Vector3.down, out RaycastHit hit, probeDistance))
         {
             return false;
         }
