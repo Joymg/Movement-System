@@ -22,8 +22,12 @@ public class MovingSphere : MonoBehaviour
     [SerializeField, Range(0f, 90f)]
     float maxGroundAngle = 25f;
 
+    //max speed at which the sphere will snap to ground (shold be a bit higher than maxSpeed)
+    [SerializeField, Range(0f, 100f)]
+    float maxSnapSpeed = 100f;
+
     Vector3 velocity, desiredVelocity;
-    //Saves thesurface's normal that is in contact with
+    //Saves the surface's normal that is in contact with
     Vector3 contactNormal;
 
     int jumpPhase;
@@ -150,6 +154,11 @@ public class MovingSphere : MonoBehaviour
         {
             return false;
         }
+        float speed = velocity.magnitude;
+        if (speed > maxSnapSpeed)
+        {
+            return false;
+        }
         //snapping will only be produced if there's ground below the sphere.
         //hit allows to check if the thing below the sphere counts as ground
         if (!Physics.Raycast(body.position,Vector3.down, out RaycastHit hit))
@@ -170,7 +179,7 @@ public class MovingSphere : MonoBehaviour
 
         //then the sphere will be considered grounded, although it's still in the air.
         //Next step is adjust the speed to the ground
-        float speed = velocity.magnitude;
+        
         float dot = Vector3.Dot(velocity, hit.normal);
 
         //if the velocity was already pointing down realign wil slow down snapping to the ground
