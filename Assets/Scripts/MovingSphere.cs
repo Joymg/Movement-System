@@ -25,12 +25,16 @@ public class MovingSphere : MonoBehaviour
     Vector3 velocity, desiredVelocity;
     //Saves thesurface's normal that is in contact with
     Vector3 contactNormal;
+
     int jumpPhase;
     float minGroundDotProduct;
+    //keeping tack of how many physic steps since the sphere was in ground
+    int stepsSinceLastGrounded;
 
     Rigidbody body;
 
     bool desiredJump;
+
     //bool isGrounded;
     int groundContactCount;
     bool IsGrounded => groundContactCount > 0;
@@ -54,8 +58,9 @@ public class MovingSphere : MonoBehaviour
         //Setting Desired Velocity
         desiredVelocity = new Vector3(playerInput.x, 0f, playerInput.y) * maxSpeed;
 
+        //making the sphere white when its not in the ground
         GetComponent<Renderer>().material.SetColor(
-            "_Color", Color.white * (groundContactCount * 0.25f)
+            "_Color", IsGrounded ? Color.black : Color.white
         );
     }
     private void FixedUpdate()
@@ -80,10 +85,11 @@ public class MovingSphere : MonoBehaviour
 
     private void UpdateState()
     {
-
+        stepsSinceLastGrounded += 1;
         velocity = body.velocity;
         if (IsGrounded)
         {
+            stepsSinceLastGrounded = 0;
             jumpPhase = 0;
             if (groundContactCount >1)
             {
