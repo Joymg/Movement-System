@@ -163,7 +163,24 @@ public class MovingSphere : MonoBehaviour
             return false;
         }
 
-        return false;
+        //if snap hasn't been aborted then we just lost contact with the ground so we snap to it
+        groundContactCount = 1;
+        //saving contacted ground's normal
+        contactNormal = hit.normal;
+
+        //then the sphere will be considered grounded, although it's still in the air.
+        //Next step is adjust the speed to the ground
+        float speed = velocity.magnitude;
+        float dot = Vector3.Dot(velocity, hit.normal);
+
+        //if the velocity was already pointing down realign wil slow down snapping to the ground
+        //so velocity its only adjusted if dot product is positive
+        if (dot > 0f)
+        {
+            velocity = (velocity - hit.normal * dot).normalized * speed;
+        }
+
+        return true;
     }
 
     private void OnCollisionEnter(Collision collision)
