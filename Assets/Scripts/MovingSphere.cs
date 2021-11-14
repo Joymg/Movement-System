@@ -61,6 +61,11 @@ public class MovingSphere : MonoBehaviour
     Vector3 contactNormal;
 
     /// <summary>
+    /// Saves the Steeps's normal that is in contact with
+    /// </summary>
+    Vector3 steepNormal;
+
+    /// <summary>
     /// Current jumps executed
     /// </summary>
     int jumpPhase;
@@ -85,6 +90,9 @@ public class MovingSphere : MonoBehaviour
 
     int groundContactCount;
     bool IsGrounded => groundContactCount > 0;
+
+    int steepContactCount;
+    bool OnSteep => steepContactCount > 0;
 
     private void Awake()
     {
@@ -155,8 +163,8 @@ public class MovingSphere : MonoBehaviour
 
     private void ClearState()
     {
-        groundContactCount = 0;
-        contactNormal = Vector3.zero;
+        groundContactCount = steepContactCount =0;
+        contactNormal = steepNormal =  Vector3.zero;
     }
 
     private void OnValidate()
@@ -274,8 +282,18 @@ public class MovingSphere : MonoBehaviour
             {
                 groundContactCount += 1;
                 //save surfaces's normal
-                //and acummulatie them if ther is more than one in contact
+                //and acummulate them if ther is more than one in contact
                 contactNormal += normal;
+            }
+
+            //If the contact is not with ground check if it is with a wall,
+            //0.01 just in case wall is not perfectly vertical
+            else if(normal.y > -0.01f)
+            {
+                steepContactCount += 1;
+                //save steep's normal
+                //and acummulate them if ther is more than one in contact
+                steepNormal += normal;
             }
         }
     }
