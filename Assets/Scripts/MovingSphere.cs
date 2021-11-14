@@ -218,6 +218,10 @@ public class MovingSphere : MonoBehaviour
             //Pressing jump quicky stacks too much upwards velocity
             float jumpSpeed = Mathf.Sqrt(-2f * Physics.gravity.y * jumpHeight);
 
+            //adding upward force to jump direction and normialize, getting the average of both,
+            //making it not affecting ground jumps but lifting up when jumping from a wall
+            jumpDirection = (jumpDirection + Vector3.up).normalized;
+
             //Get upward component of saved normal
             float alignedSpeed = Vector3.Dot(velocity, jumpDirection);
             if (alignedSpeed > 0f)
