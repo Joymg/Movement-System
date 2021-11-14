@@ -177,7 +177,25 @@ public class MovingSphere : MonoBehaviour
 
     void Jump()
     {
-        if (IsGrounded || jumpPhase < maxAirJumps)
+        //Jumps was only allowed on ground and on air, but now we have the tools to allow it from walls too
+        Vector3 jumpDirection;
+        if (IsGrounded)
+        {
+            jumpDirection = contactNormal;
+        }
+        else if (OnSteep)
+        {
+            jumpDirection = steepNormal;
+        }
+        else if (jumpPhase < maxAirJumps)
+        {
+            jumpDirection = contactNormal;
+        }
+        else
+        {
+            return;
+        }
+        //if (IsGrounded || jumpPhase < maxAirJumps)
         {
             stepsSinceLastJump = 0;
             jumpPhase += 1;
@@ -185,7 +203,7 @@ public class MovingSphere : MonoBehaviour
             float jumpSpeed = Mathf.Sqrt(-2f * Physics.gravity.y * jumpHeight);
 
             //Get upward component of saved normal
-            float alignedSpeed = Vector3.Dot(velocity, contactNormal);
+            float alignedSpeed = Vector3.Dot(velocity, jumpDirection);
             if (alignedSpeed > 0f)
             {
                 //if there is an upward force, substract it from jump speed
@@ -195,7 +213,7 @@ public class MovingSphere : MonoBehaviour
             }
 
             //Using gravity to calculate jump force
-            velocity += contactNormal * jumpSpeed;
+            velocity += jumpDirection * jumpSpeed;
         }
     }
 
