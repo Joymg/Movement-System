@@ -146,7 +146,7 @@ public class MovingSphere : MonoBehaviour
         velocity = body.velocity;
 
         //if not on the ground call SnapToground
-        if (IsGrounded || SnapToGround())
+        if (IsGrounded || SnapToGround() || CheckSteepContacts())
         {
             stepsSinceLastGrounded = 0;
             jumpPhase = 0;
@@ -296,6 +296,25 @@ public class MovingSphere : MonoBehaviour
                 steepNormal += normal;
             }
         }
+    }
+
+    /// <summary>
+    /// in case of been stuck in a crevasse use its steeps normals by pushing against those contact points 
+    /// </summary>
+
+    bool CheckSteepContacts()
+    {
+        if (steepContactCount > 1)
+        {
+            steepNormal.Normalize();
+            if (steepNormal.y >= minGroundDotProduct)
+            {
+                groundContactCount = 1;
+                contactNormal = steepNormal;
+                return true;
+            }
+        }
+        return false;
     }
 
     void AdjustVelocity()
