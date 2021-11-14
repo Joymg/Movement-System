@@ -19,10 +19,16 @@ public class MovingSphere : MonoBehaviour
     int maxAirJumps = 0;
 
     /// <summary>
-    /// Setting custom groundAngle
+    /// Every angle below this threshold is considered as grounds
     /// </summary>
     [SerializeField, Range(0f, 90f)]
     float maxGroundAngle = 25f;
+
+    /// <summary>
+    /// Angle 
+    /// </summary>
+    [SerializeField, Range(0f, 90f)]
+    float maxStairsAngle = 50f;
 
     /// <summary>
     /// Max speed at which the sphere will snap to ground (shold be a bit higher than maxSpeed)
@@ -42,6 +48,12 @@ public class MovingSphere : MonoBehaviour
     [SerializeField]
     LayerMask probeMask = -1;
 
+    /// <summary>
+    /// Layer used to detct collisions with stairs
+    /// </summary>
+    [SerializeField]
+    LayerMask stairsMask = -1;
+
     Vector3 velocity, desiredVelocity;
     /// <summary>
     /// Saves the surface's normal that is in contact with
@@ -52,7 +64,9 @@ public class MovingSphere : MonoBehaviour
     /// Current jumps executed
     /// </summary>
     int jumpPhase;
+
     float minGroundDotProduct;
+    float minStairsDotProduct;
 
     /// <summary>
     /// Keeps track of how many physic steps since the sphere was in ground
@@ -148,6 +162,7 @@ public class MovingSphere : MonoBehaviour
     private void OnValidate()
     {
         minGroundDotProduct = Mathf.Cos(maxGroundAngle * Mathf.Deg2Rad);
+        minStairsDotProduct = Mathf.Cos(maxStairsAngle * Mathf.Deg2Rad);
     }
 
    
@@ -202,7 +217,7 @@ public class MovingSphere : MonoBehaviour
         }
 
         //use collision's normal to check if its ground
-        if (hit.normal.y < minGroundDotProduct)
+        if (hit.normal.y < GetMinDot(hit.collider.gameObject.layer))
         {
             return false;
         }
@@ -227,6 +242,18 @@ public class MovingSphere : MonoBehaviour
         return true;
     }
 
+    /// <summary>
+    /// Determines the appropiete minimun given a layer
+    /// </summary>
+    /// <param name="layer">A</param>
+    /// <returns></returns>
+    float GetMinDot(int layer)
+    {
+        return (stairsMask & (1 << layer)) == 0 ?
+            minGroundDotProduct : minStairsDotProduct;
+    }
+
+
     private void OnCollisionEnter(Collision collision)
     {
         EvaluateCollision(collision);
@@ -239,10 +266,11 @@ public class MovingSphere : MonoBehaviour
 
     private void EvaluateCollision(Collision collision)
     {
+        float minDot = GetMinDot(collision.gameObject.layer);
         for (int i = 0; i < collision.contactCount; i++)
         {
             Vector3 normal = collision.GetContact(i).normal;
-            if (normal.y >= minGroundDotProduct)
+            if (normal.y >= minDot)
             {
                 groundContactCount += 1;
                 //save surfaces's normal
