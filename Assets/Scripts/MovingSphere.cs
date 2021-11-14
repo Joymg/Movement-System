@@ -149,7 +149,14 @@ public class MovingSphere : MonoBehaviour
         if (IsGrounded || SnapToGround() || CheckSteepContacts())
         {
             stepsSinceLastGrounded = 0;
-            jumpPhase = 0;
+            //checking if jumpPhase is less than maxAirJumps only works beacuse pahse is set back to zero directly after the jump
+            //beacuse in the next step the sphere is still considered as grounded.
+            //We should only reset the jump one step after the jump was initiated
+            if (stepsSinceLastJump > 1)
+            {
+                jumpPhase = 0;
+            }
+
             if (groundContactCount >1)
             {
                 contactNormal.Normalize();
@@ -186,9 +193,18 @@ public class MovingSphere : MonoBehaviour
         else if (OnSteep)
         {
             jumpDirection = steepNormal;
+            // reset jump phase when wall jumping to be able to air jump after wall jump
+            jumpPhase = 0;
         }
-        else if (jumpPhase < maxAirJumps)
+        //if air jumping is allowed allow jumping is if jump phase is equal to maxAirJumps
+        else if (maxAirJumps > 0 &&jumpPhase <= maxAirJumps)
         {
+            //However this makes it possible to do one more extra jump than intended
+            //so the first jump phase is skipped
+            if (jumpPhase == 0)
+            {
+                jumpPhase = 1;
+            }
             jumpDirection = contactNormal;
         }
         else

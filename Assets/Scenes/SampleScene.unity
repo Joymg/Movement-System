@@ -343,11 +343,15 @@ MonoBehaviour:
   jumpHeight: 2
   maxAirJumps: 0
   maxGroundAngle: 40
+  maxStairsAngle: 50
   maxSnapSpeed: 100
   probeDistance: 1
   probeMask:
     serializedVersion: 2
     m_Bits: 51
+  stairsMask:
+    serializedVersion: 2
+    m_Bits: 4294967295
 --- !u!96 &13813409
 TrailRenderer:
   serializedVersion: 2
@@ -1101,11 +1105,15 @@ MonoBehaviour:
   jumpHeight: 2
   maxAirJumps: 0
   maxGroundAngle: 40
+  maxStairsAngle: 50
   maxSnapSpeed: 100
   probeDistance: 1
   probeMask:
     serializedVersion: 2
     m_Bits: 51
+  stairsMask:
+    serializedVersion: 2
+    m_Bits: 4294967295
 --- !u!96 &37204830
 TrailRenderer:
   serializedVersion: 2
@@ -3463,7 +3471,7 @@ Transform:
   m_GameObject: {fileID: 291585406}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 3, y: 1, z: 7}
+  m_LocalScale: {x: 4, y: 1, z: 7}
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 2
@@ -3852,11 +3860,15 @@ MonoBehaviour:
   jumpHeight: 2
   maxAirJumps: 0
   maxGroundAngle: 40
+  maxStairsAngle: 50
   maxSnapSpeed: 100
   probeDistance: 1
   probeMask:
     serializedVersion: 2
     m_Bits: 51
+  stairsMask:
+    serializedVersion: 2
+    m_Bits: 4294967295
 --- !u!96 &321284336
 TrailRenderer:
   serializedVersion: 2
@@ -4087,11 +4099,15 @@ MonoBehaviour:
   jumpHeight: 2
   maxAirJumps: 0
   maxGroundAngle: 40
+  maxStairsAngle: 50
   maxSnapSpeed: 100
   probeDistance: 1
   probeMask:
     serializedVersion: 2
     m_Bits: 51
+  stairsMask:
+    serializedVersion: 2
+    m_Bits: 4294967295
 --- !u!96 &406421778
 TrailRenderer:
   serializedVersion: 2
@@ -4322,11 +4338,15 @@ MonoBehaviour:
   jumpHeight: 2
   maxAirJumps: 0
   maxGroundAngle: 40
+  maxStairsAngle: 50
   maxSnapSpeed: 100
   probeDistance: 1
   probeMask:
     serializedVersion: 2
     m_Bits: 51
+  stairsMask:
+    serializedVersion: 2
+    m_Bits: 4294967295
 --- !u!96 &426676177
 TrailRenderer:
   serializedVersion: 2
@@ -5080,11 +5100,15 @@ MonoBehaviour:
   jumpHeight: 2
   maxAirJumps: 0
   maxGroundAngle: 40
+  maxStairsAngle: 50
   maxSnapSpeed: 100
   probeDistance: 1
   probeMask:
     serializedVersion: 2
     m_Bits: 51
+  stairsMask:
+    serializedVersion: 2
+    m_Bits: 4294967295
 --- !u!96 &551737805
 TrailRenderer:
   serializedVersion: 2
@@ -6002,11 +6026,15 @@ MonoBehaviour:
   jumpHeight: 2
   maxAirJumps: 0
   maxGroundAngle: 40
+  maxStairsAngle: 50
   maxSnapSpeed: 100
   probeDistance: 1
   probeMask:
     serializedVersion: 2
     m_Bits: 51
+  stairsMask:
+    serializedVersion: 2
+    m_Bits: 4294967295
 --- !u!96 &647651609
 TrailRenderer:
   serializedVersion: 2
@@ -7540,11 +7568,15 @@ MonoBehaviour:
   jumpHeight: 2
   maxAirJumps: 0
   maxGroundAngle: 40
+  maxStairsAngle: 50
   maxSnapSpeed: 100
   probeDistance: 1
   probeMask:
     serializedVersion: 2
     m_Bits: 51
+  stairsMask:
+    serializedVersion: 2
+    m_Bits: 4294967295
 --- !u!96 &808412774
 TrailRenderer:
   serializedVersion: 2
@@ -7775,11 +7807,15 @@ MonoBehaviour:
   jumpHeight: 2
   maxAirJumps: 0
   maxGroundAngle: 40
+  maxStairsAngle: 50
   maxSnapSpeed: 100
   probeDistance: 1
   probeMask:
     serializedVersion: 2
     m_Bits: 51
+  stairsMask:
+    serializedVersion: 2
+    m_Bits: 4294967295
 --- !u!96 &858038567
 TrailRenderer:
   serializedVersion: 2
@@ -8010,11 +8046,15 @@ MonoBehaviour:
   jumpHeight: 2
   maxAirJumps: 0
   maxGroundAngle: 40
+  maxStairsAngle: 50
   maxSnapSpeed: 100
   probeDistance: 1
   probeMask:
     serializedVersion: 2
     m_Bits: 51
+  stairsMask:
+    serializedVersion: 2
+    m_Bits: 4294967295
 --- !u!96 &862312616
 TrailRenderer:
   serializedVersion: 2
@@ -8245,11 +8285,15 @@ MonoBehaviour:
   jumpHeight: 2
   maxAirJumps: 0
   maxGroundAngle: 40
+  maxStairsAngle: 50
   maxSnapSpeed: 100
   probeDistance: 1
   probeMask:
     serializedVersion: 2
     m_Bits: 51
+  stairsMask:
+    serializedVersion: 2
+    m_Bits: 4294967295
 --- !u!96 &908645381
 TrailRenderer:
   serializedVersion: 2
@@ -9131,7 +9175,7 @@ Mesh:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: pb_Mesh15886
+  m_Name: pb_Mesh27062
   serializedVersion: 10
   m_SubMeshes:
   - serializedVersion: 2
@@ -9440,11 +9484,15 @@ MonoBehaviour:
   jumpHeight: 2
   maxAirJumps: 0
   maxGroundAngle: 40
+  maxStairsAngle: 50
   maxSnapSpeed: 100
   probeDistance: 1
   probeMask:
     serializedVersion: 2
     m_Bits: 51
+  stairsMask:
+    serializedVersion: 2
+    m_Bits: 4294967295
 --- !u!96 &1106243868
 TrailRenderer:
   serializedVersion: 2
@@ -9675,11 +9723,15 @@ MonoBehaviour:
   jumpHeight: 2
   maxAirJumps: 0
   maxGroundAngle: 40
+  maxStairsAngle: 50
   maxSnapSpeed: 100
   probeDistance: 1
   probeMask:
     serializedVersion: 2
     m_Bits: 51
+  stairsMask:
+    serializedVersion: 2
+    m_Bits: 4294967295
 --- !u!96 &1156303861
 TrailRenderer:
   serializedVersion: 2
@@ -11151,11 +11203,15 @@ MonoBehaviour:
   jumpHeight: 2
   maxAirJumps: 0
   maxGroundAngle: 40
+  maxStairsAngle: 50
   maxSnapSpeed: 100
   probeDistance: 1
   probeMask:
     serializedVersion: 2
     m_Bits: 51
+  stairsMask:
+    serializedVersion: 2
+    m_Bits: 4294967295
 --- !u!96 &1296315421
 TrailRenderer:
   serializedVersion: 2
@@ -11745,11 +11801,15 @@ MonoBehaviour:
   jumpHeight: 2
   maxAirJumps: 0
   maxGroundAngle: 40
+  maxStairsAngle: 50
   maxSnapSpeed: 100
   probeDistance: 1
   probeMask:
     serializedVersion: 2
     m_Bits: 51
+  stairsMask:
+    serializedVersion: 2
+    m_Bits: 4294967295
 --- !u!96 &1356042651
 TrailRenderer:
   serializedVersion: 2
@@ -12862,11 +12922,15 @@ MonoBehaviour:
   jumpHeight: 2
   maxAirJumps: 0
   maxGroundAngle: 40
+  maxStairsAngle: 50
   maxSnapSpeed: 100
   probeDistance: 1
   probeMask:
     serializedVersion: 2
     m_Bits: 51
+  stairsMask:
+    serializedVersion: 2
+    m_Bits: 4294967295
 --- !u!96 &1440320476
 TrailRenderer:
   serializedVersion: 2
@@ -15635,11 +15699,15 @@ MonoBehaviour:
   jumpHeight: 2
   maxAirJumps: 0
   maxGroundAngle: 40
+  maxStairsAngle: 50
   maxSnapSpeed: 100
   probeDistance: 1
   probeMask:
     serializedVersion: 2
     m_Bits: 51
+  stairsMask:
+    serializedVersion: 2
+    m_Bits: 4294967295
 --- !u!96 &2013095378
 TrailRenderer:
   serializedVersion: 2
@@ -15870,11 +15938,15 @@ MonoBehaviour:
   jumpHeight: 2
   maxAirJumps: 0
   maxGroundAngle: 40
+  maxStairsAngle: 50
   maxSnapSpeed: 100
   probeDistance: 1
   probeMask:
     serializedVersion: 2
     m_Bits: 51
+  stairsMask:
+    serializedVersion: 2
+    m_Bits: 4294967295
 --- !u!96 &2021559997
 TrailRenderer:
   serializedVersion: 2
@@ -16105,11 +16177,15 @@ MonoBehaviour:
   jumpHeight: 2
   maxAirJumps: 0
   maxGroundAngle: 40
+  maxStairsAngle: 50
   maxSnapSpeed: 100
   probeDistance: 1
   probeMask:
     serializedVersion: 2
     m_Bits: 51
+  stairsMask:
+    serializedVersion: 2
+    m_Bits: 4294967295
 --- !u!96 &2034666245
 TrailRenderer:
   serializedVersion: 2
@@ -16340,11 +16416,15 @@ MonoBehaviour:
   jumpHeight: 2
   maxAirJumps: 0
   maxGroundAngle: 40
+  maxStairsAngle: 50
   maxSnapSpeed: 100
   probeDistance: 1
   probeMask:
     serializedVersion: 2
     m_Bits: 51
+  stairsMask:
+    serializedVersion: 2
+    m_Bits: 4294967295
 --- !u!96 &2049323843
 TrailRenderer:
   serializedVersion: 2
