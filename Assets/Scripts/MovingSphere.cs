@@ -113,10 +113,6 @@ public class MovingSphere : MonoBehaviour
         //Setting Desired Velocity
         desiredVelocity = new Vector3(playerInput.x, 0f, playerInput.y) * maxSpeed;
 
-        //making the sphere white when its not in the ground
-        GetComponent<Renderer>().material.SetColor(
-            "_Color", IsGrounded ? Color.black : Color.white
-        );
     }
     private void FixedUpdate()
     {
