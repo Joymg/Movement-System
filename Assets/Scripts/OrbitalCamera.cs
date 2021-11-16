@@ -32,6 +32,11 @@ public class OrbitalCamera : MonoBehaviour
     [SerializeField, Range(1f, 360f)]
     float rotationSpeed = 90f;
 
+    /// <summary>
+    /// Contraints for vertical rotation
+    /// </summary>
+    [SerializeField, Range(-89f, 89f)]
+    float minVerticalAngle = -30f, maxVerticalAngle = 60f;
 
     Vector3 focusPoint;
 
@@ -43,14 +48,37 @@ public class OrbitalCamera : MonoBehaviour
     private void Awake()
     {
         focusPoint = focus.position;
+        transform.localRotation = Quaternion.Euler(orbitAngles);
+    }
+
+
+    /// <summary>
+    /// Just in case wrong values are introduced in the editor. Max value should never be less than min value
+    /// </summary>
+    private void OnValidate()
+    {
+        if (maxVerticalAngle < minVerticalAngle)
+        {
+            maxVerticalAngle = minVerticalAngle;
+        }
     }
 
     //using late updat in case anything moves the target in update
     private void LateUpdate()
     {
         UpdateFocusPoint();
-        ManualRotation();
-        Quaternion lookRotation = Quaternion.Euler(orbitAngles);
+        Quaternion lookRotation;
+
+        //constraining the angles only when moving the camera
+        if (ManualRotation())
+        {
+            ConstrainAngles();
+            lookRotation = Quaternion.Euler(orbitAngles);
+        }
+        else
+        {
+            lookRotation = transform.localRotation;
+        }
         Vector3 lookDirection = lookRotation * Vector3.forward;
         Vector3 lookPosition = focusPoint - lookDirection * distance;
         transform.SetPositionAndRotation(lookPosition, lookRotation);
@@ -84,7 +112,7 @@ public class OrbitalCamera : MonoBehaviour
             focusPoint = targetPoint;
     }
 
-    void ManualRotation()
+    bool ManualRotation()
     {
         //gets the input
         Vector2 input = new Vector2(Input.GetAxis("Vertical Camera"), Input.GetAxis("Horizontal Camera"));
@@ -92,6 +120,25 @@ public class OrbitalCamera : MonoBehaviour
         if (input.x < -e || input.x > e || input.y < -e || input.y > e )
         {
             orbitAngles += rotationSpeed * Time.unscaledDeltaTime * input;
+            return true;
         }
+        return false;
+    }
+
+    /// <summary>
+    /// Clamps the vertical orbit angle, horizontal orbit has no limit, but will be kept in 0-360 range
+    /// </summary>
+    void ConstrainAngles()
+    {
+        orbitAngles.x = Mathf.Clamp(orbitAngles.x, minVerticalAngle, maxVerticalAngle);
+        if (orbitAngles.y < 0f)
+        {
+            orbitAngles.y += 360f;
+        }
+        else if (orbitAngles.y >= 360f)
+        {
+            orbitAngles.y -= 360f;
+        }
+
     }
 }
