@@ -44,12 +44,19 @@ public class OrbitalCamera : MonoBehaviour
     [SerializeField, Min(0f)]
     float alignDelay = 5f;
 
+
+    /// <summary>
+    /// Angle between current and desired angle when aligment will go at full rotationSpeed
+    /// </summary>
+    [SerializeField, Range(0f, 90f)]
+    float alignSmoothRange = 45f;
+
     Vector3 focusPoint, previousFocusPoint;
 
     /// <summary>
     /// Orientation of the camera
     /// </summary>
-    public Vector2 orbitAngles = new Vector2(45f, 0f);
+    Vector2 orbitAngles = new Vector2(45f, 0f);
 
     float lastManualRotationTime;
 
@@ -158,9 +165,28 @@ public class OrbitalCamera : MonoBehaviour
             return false;
         }
 
+
         //normalized movement vector (as sqrMagnitude is calculated is more efficient to normalize it this way)
         float headingAngle = GetAngle(movement / Mathf.Sqrt(movementDeltaSqr));
-        orbitAngles.y = headingAngle;
+
+        //if this value is in the smooth range, rotation speed will ge scaled accordingly
+        float deltaAbs = Mathf.Abs(Mathf.DeltaAngle(orbitAngles.y, headingAngle));
+
+        //using rotationSpeed to make a smooth rotation like in manual rotation
+        //also dampening rotation of tiny angle
+        float rotationChange = rotationSpeed * Mathf.Min(Time.unscaledDeltaTime, movementDeltaSqr);
+        if (deltaAbs < alignSmoothRange)
+        {
+            rotationChange *= deltaAbs / alignSmoothRange;
+        }
+
+        //also reducing rotationSpeed moving towards the camera
+        else if (180f - deltaAbs < alignSmoothRange)
+        {
+            rotationChange *= (180f - deltaAbs) / alignSmoothRange;
+        }
+
+        orbitAngles.y = Mathf.MoveTowardsAngle(orbitAngles.y,headingAngle,rotationChange);
 
         return true;
     }
