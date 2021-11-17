@@ -6676,7 +6676,7 @@ Mesh:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: pb_Mesh25220
+  m_Name: pb_Mesh15690
   serializedVersion: 10
   m_SubMeshes:
   - serializedVersion: 2
@@ -8985,7 +8985,7 @@ MonoBehaviour:
   minVerticalAngle: 5
   maxVerticalAngle: 60
   alignDelay: 5
-  orbitAngles: {x: 45, y: 0}
+  alignSmoothRange: 45
 --- !u!1 &1300512869
 GameObject:
   m_ObjectHideFlags: 0
@@ -9900,6 +9900,10 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 4548414025430605609, guid: ee47b5cfaadddcb468b3205853fb5029, type: 3}
+      propertyPath: playerInputSpace
+      value: 
+      objectReference: {fileID: 963194228}
     - target: {fileID: 4548414025430605610, guid: ee47b5cfaadddcb468b3205853fb5029, type: 3}
       propertyPath: m_Name
       value: Sphere
