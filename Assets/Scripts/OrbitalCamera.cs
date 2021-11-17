@@ -52,6 +52,12 @@ public class OrbitalCamera : MonoBehaviour
     [SerializeField, Range(0f, 90f)]
     float alignSmoothRange = 45f;
 
+    /// <summary>
+    /// Allows to ignore geometry not wanted when performing the box cast(Sphere should be ignored)
+    /// </summary>
+    [SerializeField]
+    LayerMask obstructionMask = -1;
+
     Vector3 focusPoint, previousFocusPoint;
 
     /// <summary>
@@ -130,7 +136,7 @@ public class OrbitalCamera : MonoBehaviour
 
 
         //casting box cast until camera near clip plane
-        if (Physics.BoxCast(castFrom, CameraHalfExtends, castDirection, out RaycastHit hit, lookRotation, castDistance))
+        if (Physics.BoxCast(castFrom, CameraHalfExtends, castDirection, out RaycastHit hit, lookRotation, castDistance,obstructionMask))
         {
             //if something gets hit box is positioned as far as posible, then get offsetted to find the corresponding camera position
             rectPosition = castFrom + castDirection * hit.distance;
