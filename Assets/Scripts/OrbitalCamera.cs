@@ -117,11 +117,24 @@ public class OrbitalCamera : MonoBehaviour
         Vector3 lookDirection = lookRotation * Vector3.forward;
         Vector3 lookPosition = focusPoint - lookDirection * distance;
 
+        //when focus is relaxed is possible to end up with a focus point inside the geometry even though the idel focus point is valid
+        //so we cannot expect the focus pint to be a valid start of the cast box, ideal focus point will be used instead
+        //from there the cast will be doneto the near plane box position,
+        //found by moving from the camera position to the focus position until reachethe near plane
+        Vector3 rectOffset = lookDirection * regularCamera.nearClipPlane;
+        Vector3 rectPosition = lookPosition + rectOffset;
+        Vector3 castFrom = focus.position;
+        Vector3 castLine = rectPosition - castFrom;
+        float castDistance = castLine.magnitude;
+        Vector3 castDirection = castLine / castDistance;
+
+
         //casting box cast until camera near clip plane
-        if (Physics.BoxCast(focusPoint, CameraHalfExtends,-lookDirection, out RaycastHit hit, lookRotation, distance-regularCamera.nearClipPlane))
+        if (Physics.BoxCast(castFrom, CameraHalfExtends, castDirection, out RaycastHit hit, lookRotation, castDistance))
         {
-            //if something gets hitted final distance is hit distance + nearplane distance
-            lookPosition = focusPoint - lookDirection * (hit.distance + regularCamera.nearClipPlane);
+            //if something gets hit box is positioned as far as posible, then get offsetted to find the corresponding camera position
+            rectPosition = castFrom + castDirection * hit.distance;
+            lookPosition =rectPosition-rectOffset;
             //INFO: this can make the camera's postition end up inside the geometry , but its near plane will always remain outside
 
         }
