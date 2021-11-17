@@ -38,12 +38,20 @@ public class OrbitalCamera : MonoBehaviour
     [SerializeField, Range(-89f, 89f)]
     float minVerticalAngle = -30f, maxVerticalAngle = 60f;
 
-    Vector3 focusPoint;
+    /// <summary>
+    /// Delay until the camera places itself behind the target
+    /// </summary>
+    [SerializeField, Min(0f)]
+    float alignDelay = 5f;
+
+    Vector3 focusPoint, previousFocusPoint;
 
     /// <summary>
     /// Orientation of the camera
     /// </summary>
-    Vector2 orbitAngles = new Vector2(45f, 0f);
+    public Vector2 orbitAngles = new Vector2(45f, 0f);
+
+    float lastManualRotationTime;
 
     private void Awake()
     {
@@ -70,7 +78,7 @@ public class OrbitalCamera : MonoBehaviour
         Quaternion lookRotation;
 
         //constraining the angles only when moving the camera
-        if (ManualRotation())
+        if (ManualRotation() || AutomaticRotation())
         {
             ConstrainAngles();
             lookRotation = Quaternion.Euler(orbitAngles);
@@ -86,6 +94,8 @@ public class OrbitalCamera : MonoBehaviour
 
     void UpdateFocusPoint()
     {
+
+        previousFocusPoint = focusPoint;
         //if focus Radius is positive
         Vector3 targetPoint = focus.position;
         if (focusRadius > 0f)
@@ -117,12 +127,42 @@ public class OrbitalCamera : MonoBehaviour
         //gets the input
         Vector2 input = new Vector2(Input.GetAxis("Vertical Camera"), Input.GetAxis("Horizontal Camera"));
         const float e = 0.001f;
-        if (input.x < -e || input.x > e || input.y < -e || input.y > e )
+        if (input.x < -e || input.x > e || input.y < -e || input.y > e)
         {
             orbitAngles += rotationSpeed * Time.unscaledDeltaTime * input;
+
+            //saving when the last manual rotation happened
+            lastManualRotationTime = Time.unscaledTime;
             return true;
         }
         return false;
+    }
+
+    bool AutomaticRotation()
+    {
+        //start aligning after the  delay if a manual rotation ocurred
+        if (Time.unscaledTime - lastManualRotationTime < alignDelay)
+        {
+            return false;
+        }
+
+        //calculate movement between current and previous focusPoints
+        Vector2 movement = new Vector2(
+            focusPoint.x - previousFocusPoint.x,
+            focusPoint.z - previousFocusPoint.z
+        );
+        float movementDeltaSqr = movement.sqrMagnitude;
+        //if sqr magnitude is smaller than a smal threshold then there is no movement
+        if (movementDeltaSqr < 0.000001f)
+        {
+            return false;
+        }
+
+        //normalized movement vector (as sqrMagnitude is calculated is more efficient to normalize it this way)
+        float headingAngle = GetAngle(movement / Mathf.Sqrt(movementDeltaSqr));
+        orbitAngles.y = headingAngle;
+
+        return true;
     }
 
     /// <summary>
@@ -140,5 +180,18 @@ public class OrbitalCamera : MonoBehaviour
             orbitAngles.y -= 360f;
         }
 
+    }
+
+    /// <summary>
+    /// Calculate the horizontal angle of a direction
+    /// </summary>
+    /// <param name="direction">Current direction</param>
+    /// <returns></returns>
+    static float GetAngle(Vector2 direction)
+    {
+        // Y direction component is cosine of angle looked for, so Acos and rad2deg
+        float angle = Mathf.Acos(direction.y) * Mathf.Rad2Deg;
+        //rotation could be clockwise or counter clockwise, x negative : ccw, x positive: cw
+        return direction.x < 0f ? 360f - angle : angle;
     }
 }

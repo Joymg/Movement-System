@@ -8984,6 +8984,8 @@ MonoBehaviour:
   rotationSpeed: 90
   minVerticalAngle: 5
   maxVerticalAngle: 60
+  alignDelay: 5
+  orbitAngles: {x: 45, y: 0}
 --- !u!1 &1300512869
 GameObject:
   m_ObjectHideFlags: 0
