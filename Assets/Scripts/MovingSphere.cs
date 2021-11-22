@@ -6,6 +6,13 @@ using UnityEngine;
 
 public class MovingSphere : MonoBehaviour
 {
+
+    /// <summary>
+    /// Orbital camera component
+    /// </summary>
+    [SerializeField]
+    Transform playerInputSpace = default;
+
     [SerializeField, Range(0f, 100f)]
     float maxAcceleration = 10f, maxAirAcceleration = 1f;
 
@@ -110,9 +117,30 @@ public class MovingSphere : MonoBehaviour
         playerInput.y = Input.GetAxis("Vertical");
         playerInput = Vector2.ClampMagnitude(playerInput, 1f);
 
-        //Setting Desired Velocity
-        desiredVelocity = new Vector3(playerInput.x, 0f, playerInput.y) * maxSpeed;
+        //if playerInputSpace is set
+        if (playerInputSpace)
+        {
+            //forward speed was affected by vertical orbit angle
+            Vector3 forward = playerInputSpace.forward;
+            forward.y = 0;
+            forward.Normalize();
 
+            Vector3 right = playerInputSpace.right;
+            right.y = 0f;
+            right.Normalize();
+            //convert from provided space to world space with the new normalized vectors
+            // now desiredVelocity becomes the sum of those vectors scaled by player input
+
+            desiredVelocity = (forward * playerInput.y + right * playerInput.x) * maxSpeed;
+        }
+
+        //else keep world space
+        else
+        {
+            //Setting Desired Velocity
+            desiredVelocity = new Vector3(playerInput.x, 0f, playerInput.y) * maxSpeed;
+
+        }
     }
     private void FixedUpdate()
     {
