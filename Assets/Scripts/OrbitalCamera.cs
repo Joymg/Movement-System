@@ -85,11 +85,22 @@ public class OrbitalCamera : MonoBehaviour
 
     float lastManualRotationTime;
 
+    /// <summary>
+    /// Quaternion used to apply a second rotation that align the orbit rotation with the camera, 
+    /// to keep the orbit angles controlling caamera's orbit and constarining them
+    /// </summary>
+    Quaternion gravityAlignement = Quaternion.identity;
+
+    /// <summary>
+    /// Orbit Rotation, for keeping its logic unaware of gravity alignement
+    /// </summary>
+    Quaternion orbitRotation;
+
     private void Awake()
     {
         regularCamera = GetComponent<Camera>();
         focusPoint = focus.position;
-        transform.localRotation = Quaternion.Euler(orbitAngles);
+        transform.localRotation =  orbitRotation = Quaternion.Euler(orbitAngles);
     }
 
 
@@ -107,19 +118,25 @@ public class OrbitalCamera : MonoBehaviour
     //using late updat in case anything moves the target in update
     private void LateUpdate()
     {
+        //adjusting the alignemet to keep it in sync with current up directiom
+        //minimal rotation is calculated from last aligned up tu current up,
+        //and then multiplied with current up to get the new one
+        gravityAlignement = Quaternion.FromToRotation(
+            gravityAlignement * Vector3.up, -Physics.gravity.normalized)
+            * gravityAlignement;
+
         UpdateFocusPoint();
-        Quaternion lookRotation;
 
         //constraining the angles only when moving the camera
+        ///orbit rotation only changes when there is a rotation
         if (ManualRotation() || AutomaticRotation())
         {
             ConstrainAngles();
-            lookRotation = Quaternion.Euler(orbitAngles);
+            orbitRotation = Quaternion.Euler(orbitAngles);
         }
-        else
-        {
-            lookRotation = transform.localRotation;
-        }
+
+        
+        Quaternion lookRotation = gravityAlignement * orbitRotation;
         Vector3 lookDirection = lookRotation * Vector3.forward;
         Vector3 lookPosition = focusPoint - lookDirection * distance;
 
@@ -203,10 +220,10 @@ public class OrbitalCamera : MonoBehaviour
         }
 
         //calculate movement between current and previous focusPoints
-        Vector2 movement = new Vector2(
-            focusPoint.x - previousFocusPoint.x,
-            focusPoint.z - previousFocusPoint.z
-        );
+        //gravity alignement gets undone to determine the correct angles
+        Vector3 alignedDelta = Quaternion.Inverse(gravityAlignement) *
+            (focusPoint - previousFocusPoint);
+        Vector2 movement = new Vector2(alignedDelta.x,alignedDelta.y);
         float movementDeltaSqr = movement.sqrMagnitude;
         //if sqr magnitude is smaller than a smal threshold then there is no movement
         if (movementDeltaSqr < 0.000001f)
