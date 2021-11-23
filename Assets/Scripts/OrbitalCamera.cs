@@ -122,7 +122,7 @@ public class OrbitalCamera : MonoBehaviour
         //minimal rotation is calculated from last aligned up tu current up,
         //and then multiplied with current up to get the new one
         gravityAlignement = Quaternion.FromToRotation(
-            gravityAlignement * Vector3.up, -Physics.gravity.normalized)
+            gravityAlignement * Vector3.up, CustomGravity.GetUpAxis(focusPoint))
             * gravityAlignement;
 
         UpdateFocusPoint();
