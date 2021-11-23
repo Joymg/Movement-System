@@ -8,16 +8,15 @@ using UnityEngine;
 public static class CustomGravity 
 {
 
-    /// <summary>
-    /// 
-    /// </summary>
-    /// <param name="position"></param>
-    /// <param name="upAxis"></param>
-    /// <returns></returns>
+    public static Vector3 GetGravity(Vector3 position)
+    {
+        return position.normalized * Physics.gravity.y;
+    }
+
     public static Vector3 GetGravity(Vector3 position, out Vector3 upAxis)
     {
-        upAxis = -Physics.gravity.normalized;
-        return Physics.gravity;
+        upAxis = position.normalized;
+        return upAxis * Physics.gravity.y;
     }
 
     /// <summary>
@@ -27,7 +26,7 @@ public static class CustomGravity
     /// <returns>Up axis from current position</returns>
     public static Vector3 GetUpAxis(Vector3 position)
     {
-        return Physics.gravity.normalized;
+        return position.normalized;
     }
 
 

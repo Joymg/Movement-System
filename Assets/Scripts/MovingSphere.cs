@@ -114,6 +114,8 @@ public class MovingSphere : MonoBehaviour
     private void Awake()
     {
         body = GetComponent<Rigidbody>();
+        //cause we are use custom gravity, RB gravity is desactivated
+        body.useGravity = false;
         OnValidate();
     }
 
@@ -155,7 +157,7 @@ public class MovingSphere : MonoBehaviour
     private void FixedUpdate()
     {
         //adding suport for chaging gravity direction, it points in the opposite direction that gravity pulls
-        upAxis = -Physics.gravity.normalized;
+        Vector3 gravity = CustomGravity.GetGravity(body.position, out upAxis);
         UpdateState();
 
         AdjustVelocity();
@@ -164,9 +166,11 @@ public class MovingSphere : MonoBehaviour
         if (desiredJump)
         {
             desiredJump = false;
-            Jump();
+            Jump(gravity);
         }
 
+        //applying the gravity
+        velocity += gravity * Time.deltaTime;
         body.velocity = velocity;
 
         ClearState();
@@ -209,7 +213,7 @@ public class MovingSphere : MonoBehaviour
         contactNormal = steepNormal =  Vector3.zero;
     }
 
-    void Jump()
+    void Jump(Vector3 gravity)
     {
         //Jumps was only allowed on ground and on air, but now we have the tools to allow it from walls too
         Vector3 jumpDirection;
@@ -242,7 +246,7 @@ public class MovingSphere : MonoBehaviour
         stepsSinceLastJump = 0;
         jumpPhase += 1;
         //Pressing jump quicky stacks too much upwards velocity
-        float jumpSpeed = Mathf.Sqrt(2f * Physics.gravity.magnitude * jumpHeight);
+        float jumpSpeed = Mathf.Sqrt(2f * gravity.magnitude * jumpHeight);
 
         //adding upward force to jump direction and normialize, getting the average of both,
         //making it not affecting ground jumps but lifting up when jumping from a wall
