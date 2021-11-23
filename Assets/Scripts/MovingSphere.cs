@@ -73,6 +73,11 @@ public class MovingSphere : MonoBehaviour
     Vector3 steepNormal;
 
     /// <summary>
+    /// Y axis won't be up and down strictly, now can be modified
+    /// </summary>
+    Vector3 upAxis;
+
+    /// <summary>
     /// Current jumps executed
     /// </summary>
     int jumpPhase;
@@ -144,7 +149,8 @@ public class MovingSphere : MonoBehaviour
     }
     private void FixedUpdate()
     {
-
+        //adding suport for chaging gravity direction, it points in the opposite direction that gravity pulls
+        upAxis = -Physics.gravity.normalized;
         UpdateState();
 
         AdjustVelocity();
@@ -188,7 +194,7 @@ public class MovingSphere : MonoBehaviour
         }
         else
         {
-            contactNormal = Vector3.up;
+            contactNormal = upAxis;
         }
     }
 
@@ -235,30 +241,29 @@ public class MovingSphere : MonoBehaviour
         {
             return;
         }
-        //if (IsGrounded || jumpPhase < maxAirJumps)
+
+        stepsSinceLastJump = 0;
+        jumpPhase += 1;
+        //Pressing jump quicky stacks too much upwards velocity
+        float jumpSpeed = Mathf.Sqrt(2f * Physics.gravity.magnitude * jumpHeight);
+
+        //adding upward force to jump direction and normialize, getting the average of both,
+        //making it not affecting ground jumps but lifting up when jumping from a wall
+        jumpDirection = (jumpDirection + upAxis).normalized;
+
+        //Get upward component of saved normal
+        float alignedSpeed = Vector3.Dot(velocity, jumpDirection);
+        if (alignedSpeed > 0f)
         {
-            stepsSinceLastJump = 0;
-            jumpPhase += 1;
-            //Pressing jump quicky stacks too much upwards velocity
-            float jumpSpeed = Mathf.Sqrt(-2f * Physics.gravity.y * jumpHeight);
-
-            //adding upward force to jump direction and normialize, getting the average of both,
-            //making it not affecting ground jumps but lifting up when jumping from a wall
-            jumpDirection = (jumpDirection + Vector3.up).normalized;
-
-            //Get upward component of saved normal
-            float alignedSpeed = Vector3.Dot(velocity, jumpDirection);
-            if (alignedSpeed > 0f)
-            {
-                //if there is an upward force, substract it from jump speed
-                //before adding it to velocity, so it wont exceed the limit
-                jumpSpeed = Mathf.Max(jumpSpeed - alignedSpeed, 0f);
-                //with max( ) we prevent a jump from slow it down so it wont be negative
-            }
-
-            //Using gravity to calculate jump force
-            velocity += jumpDirection * jumpSpeed;
+            //if there is an upward force, substract it from jump speed
+            //before adding it to velocity, so it wont exceed the limit
+            jumpSpeed = Mathf.Max(jumpSpeed - alignedSpeed, 0f);
+            //with max( ) we prevent a jump from slow it down so it wont be negative
         }
+
+        //Using gravity to calculate jump force
+        velocity += jumpDirection * jumpSpeed;
+
     }
 
     //keeps the sphere stuck to the ground,only invoked if in the air
@@ -281,13 +286,15 @@ public class MovingSphere : MonoBehaviour
         }
         //snapping will only be produced if there's ground below the sphere.
         //hit allows to check if the thing below the sphere counts as ground
-        if (!Physics.Raycast(body.position,Vector3.down, out RaycastHit hit, probeDistance, probeMask))
+        if (!Physics.Raycast(body.position, -upAxis, out RaycastHit hit, probeDistance, probeMask))
         {
             return false;
         }
 
-        //use collision's normal to check if its ground
-        if (hit.normal.y < GetMinDot(hit.collider.gameObject.layer))
+        //adding the possibility to change the gravty direction makes that hits normal is not a viable option
+        //dot product has to be calculated
+        float upDot = Vector3.Dot(upAxis,hit.normal);
+        if (upDot < GetMinDot(hit.collider.gameObject.layer))
         {
             return false;
         }
@@ -340,7 +347,8 @@ public class MovingSphere : MonoBehaviour
         for (int i = 0; i < collision.contactCount; i++)
         {
             Vector3 normal = collision.GetContact(i).normal;
-            if (normal.y >= minDot)
+            float upDot = Vector3.Dot(upAxis, normal);
+            if (upDot >= minDot)
             {
                 groundContactCount += 1;
                 //save surfaces's normal
@@ -350,7 +358,7 @@ public class MovingSphere : MonoBehaviour
 
             //If the contact is not with ground check if it is with a wall,
             //0.01 just in case wall is not perfectly vertical
-            else if(normal.y > -0.01f)
+            else if(upDot > -0.01f)
             {
                 steepContactCount += 1;
                 //save steep's normal
@@ -369,7 +377,8 @@ public class MovingSphere : MonoBehaviour
         if (steepContactCount > 1)
         {
             steepNormal.Normalize();
-            if (steepNormal.y >= minGroundDotProduct)
+            float upDot = Vector3.Dot(upAxis, steepNormal);
+            if (upDot >= minGroundDotProduct)
             {
                 groundContactCount = 1;
                 contactNormal = steepNormal;

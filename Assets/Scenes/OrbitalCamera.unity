@@ -8984,7 +8984,7 @@ MonoBehaviour:
   rotationSpeed: 90
   minVerticalAngle: 5
   maxVerticalAngle: 60
-  alignDelay: 5
+  alignDelay: 2
   alignSmoothRange: 45
   obstructionMask:
     serializedVersion: 2
@@ -9904,9 +9904,17 @@ PrefabInstance:
     m_TransformParent: {fileID: 0}
     m_Modifications:
     - target: {fileID: 4548414025430605609, guid: ee47b5cfaadddcb468b3205853fb5029, type: 3}
+      propertyPath: maxAirJumps
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 4548414025430605609, guid: ee47b5cfaadddcb468b3205853fb5029, type: 3}
       propertyPath: playerInputSpace
       value: 
       objectReference: {fileID: 963194228}
+    - target: {fileID: 4548414025430605609, guid: ee47b5cfaadddcb468b3205853fb5029, type: 3}
+      propertyPath: maxAirAcceleration
+      value: 5
+      objectReference: {fileID: 0}
     - target: {fileID: 4548414025430605610, guid: ee47b5cfaadddcb468b3205853fb5029, type: 3}
       propertyPath: m_Name
       value: Sphere
