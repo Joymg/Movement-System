@@ -78,6 +78,11 @@ public class MovingSphere : MonoBehaviour
     Vector3 upAxis;
 
     /// <summary>
+    /// Vectors used for relative movement when gravity direction is not in the Y axis
+    /// </summary>
+    Vector3 rightAxis, forwardAxis;
+
+    /// <summary>
     /// Current jumps executed
     /// </summary>
     int jumpPhase;
@@ -112,10 +117,15 @@ public class MovingSphere : MonoBehaviour
         OnValidate();
     }
 
+    private void OnValidate()
+    {
+        minGroundDotProduct = Mathf.Cos(maxGroundAngle * Mathf.Deg2Rad);
+        minStairsDotProduct = Mathf.Cos(maxStairsAngle * Mathf.Deg2Rad);
+    }
+
+
     private void Update()
     {
-    
-        desiredJump |= Input.GetButtonDown("Jump");
 
         Vector2 playerInput;
         playerInput.x = Input.GetAxis("Horizontal");
@@ -125,27 +135,22 @@ public class MovingSphere : MonoBehaviour
         //if playerInputSpace is set
         if (playerInputSpace)
         {
-            //forward speed was affected by vertical orbit angle
-            Vector3 forward = playerInputSpace.forward;
-            forward.y = 0;
-            forward.Normalize();
 
-            Vector3 right = playerInputSpace.right;
-            right.y = 0f;
-            right.Normalize();
-            //convert from provided space to world space with the new normalized vectors
-            // now desiredVelocity becomes the sum of those vectors scaled by player input
-
-            desiredVelocity = (forward * playerInput.y + right * playerInput.x) * maxSpeed;
+            rightAxis = ProjectOnContactPlane(playerInputSpace.right, upAxis);
+            forwardAxis = ProjectOnContactPlane(playerInputSpace.forward,upAxis);
         }
-
         //else keep world space
         else
         {
-            //Setting Desired Velocity
-            desiredVelocity = new Vector3(playerInput.x, 0f, playerInput.y) * maxSpeed;
-
+            rightAxis = ProjectOnContactPlane(Vector3.right, upAxis);
+            forwardAxis = ProjectOnContactPlane(Vector3.forward, upAxis);
         }
+
+            //Setting Desired Velocity
+        desiredVelocity = new Vector3(playerInput.x, 0f, playerInput.y) * maxSpeed;
+
+        desiredJump |= Input.GetButtonDown("Jump");
+
     }
     private void FixedUpdate()
     {
@@ -203,14 +208,6 @@ public class MovingSphere : MonoBehaviour
         groundContactCount = steepContactCount =0;
         contactNormal = steepNormal =  Vector3.zero;
     }
-
-    private void OnValidate()
-    {
-        minGroundDotProduct = Mathf.Cos(maxGroundAngle * Mathf.Deg2Rad);
-        minStairsDotProduct = Mathf.Cos(maxStairsAngle * Mathf.Deg2Rad);
-    }
-
-   
 
     void Jump()
     {
@@ -391,8 +388,8 @@ public class MovingSphere : MonoBehaviour
     void AdjustVelocity()
     {
         //Determine projected axes by projecting vectors on contact plane
-        Vector3 xAxis = ProjectOnContactPlane(Vector3.right).normalized;
-        Vector3 zAxis = ProjectOnContactPlane(Vector3.forward).normalized;
+        Vector3 xAxis = ProjectOnContactPlane(rightAxis,contactNormal);
+        Vector3 zAxis = ProjectOnContactPlane(forwardAxis,contactNormal);
 
         //project currentvelocity on both vectors to get relatives speeds
         float currentX = Vector3.Dot(velocity, xAxis);
@@ -412,7 +409,14 @@ public class MovingSphere : MonoBehaviour
         //adjust velocity bya dding differences between new and old speeds
         velocity += xAxis * (newX - currentX) + zAxis * (newZ - currentZ);
     }
-    private Vector3 ProjectOnContactPlane(Vector3 vector)
+
+    /// <summary>
+    /// Projects a direction in a plane, it works with an arbirary normal and normalize at the end
+    /// </summary>
+    /// <param name="vector">Vector projected on a plane</param>
+    /// <param name="normal">Plane's normal</param>
+    /// <returns>Normalized projection of the vector in a plane</returns>
+    private Vector3 ProjectOnContactPlane(Vector3 vector,Vector3 normal)
     {
         return vector - contactNormal * Vector3.Dot(vector, contactNormal);
     }
