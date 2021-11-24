@@ -2310,7 +2310,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   gravity: 9.81
-  range: 1
+  range: 4
 --- !u!4 &332515108
 Transform:
   m_ObjectHideFlags: 0
@@ -4363,7 +4363,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   gravity: 9.81
-  range: 1
+  range: 4
 --- !u!4 &809862050
 Transform:
   m_ObjectHideFlags: 0
@@ -10693,6 +10693,7 @@ MonoBehaviour:
   minVerticalAngle: -30
   maxVerticalAngle: 60
   alignDelay: 5
+  upAlignementSpeed: 360
   alignSmoothRange: 45
   obstructionMask:
     serializedVersion: 2
