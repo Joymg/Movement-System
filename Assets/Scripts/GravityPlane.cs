@@ -16,7 +16,13 @@ public class GravityPlane : GravitySource
         {
             return Vector3.zero;
         }
-        return -gravity * up;
+
+        float g = -gravity;
+        if (distance > 0f)
+        {
+            g *= 1f - distance / range;
+        }
+        return g * up;
     }
 
 #if UNITY_EDITOR
@@ -25,7 +31,7 @@ public class GravityPlane : GravitySource
     {
         Vector3 scale = transform.localScale;
         scale.y = range;
-        Gizmos.matrix = Matrix4x4.TRS(transform.position,transform.rotation,scale);
+        Gizmos.matrix = Matrix4x4.TRS(transform.position,transform.rotation, scale);
         Vector3 size = new Vector3(1f, 0f, 1f);
         Gizmos.color = Color.yellow;
         Gizmos.DrawWireCube(Vector3.zero, size);
