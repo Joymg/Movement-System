@@ -47,6 +47,12 @@ public class OrbitalCamera : MonoBehaviour
     float alignDelay = 5f;
 
     /// <summary>
+    /// Used to slow down the camera flip when gravity changes direction
+    /// </summary>
+    [SerializeField, Min(0f)]
+    float upAlignementSpeed = 360;
+
+    /// <summary>
     /// Angle between current and desired angle when aligment will go at full rotationSpeed
     /// </summary>
     [SerializeField, Range(0f, 90f)]
@@ -118,13 +124,9 @@ public class OrbitalCamera : MonoBehaviour
     //using late updat in case anything moves the target in update
     private void LateUpdate()
     {
-        //adjusting the alignemet to keep it in sync with current up directiom
-        //minimal rotation is calculated from last aligned up tu current up,
-        //and then multiplied with current up to get the new one
-        gravityAlignement = Quaternion.FromToRotation(
-            gravityAlignement * Vector3.up, CustomGravity.GetUpAxis(focusPoint))
-            * gravityAlignement;
 
+
+        UpdateGravityAlignement();
         UpdateFocusPoint();
 
         //constraining the angles only when moving the camera
@@ -163,6 +165,37 @@ public class OrbitalCamera : MonoBehaviour
         }
 
         transform.SetPositionAndRotation(lookPosition, lookRotation);
+    }
+
+    void UpdateGravityAlignement()
+    {
+
+        //adjusting the alignemet to keep it in sync with current up directiom
+        //minimal rotation is calculated from last aligned up tu current up,
+        //and then multiplied with current up to get the new one
+        Vector3 fromUp = gravityAlignement * Vector3.up;
+        Vector3 toUp = CustomGravity.GetUpAxis(focusPoint);
+
+        //find the angle between up vectors with their dot products
+        //dot product is clamped because folling ACos func needs a value between -1 and 1
+        float dot = Mathf.Clamp(Vector3.Dot(fromUp, toUp),-1f,1f);
+        //converting it to degrees
+        float angle = Mathf.Acos(dot) * Mathf.Rad2Deg;
+        //maximum angle allowed 
+        float maxAngle = upAlignementSpeed * Time.deltaTime;
+
+        Quaternion newAlignement = Quaternion.FromToRotation(fromUp, toUp) * gravityAlignement;
+
+        //if the angle is small enougth alignment is applied directly as usual
+        if (angle <= maxAngle)
+        {
+            gravityAlignement = newAlignement;
+        }
+        //otherwise alignment is interpolated between current and desired position 
+        else
+        {
+            gravityAlignement = Quaternion.SlerpUnclamped(gravityAlignement, newAlignement, maxAngle / angle);
+        }
     }
 
     void UpdateFocusPoint()
