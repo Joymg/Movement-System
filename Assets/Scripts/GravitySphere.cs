@@ -28,7 +28,7 @@ public class GravitySphere : GravitySource
     {
         innerFalloffRadius = Mathf.Max(innerFalloffRadius, 0f);
         innerRadius = Mathf.Max(innerRadius,innerFalloffRadius);
-        outerRadius = Mathf.Max(outerRadius,outerFalloffRadius);
+        outerRadius = Mathf.Max(outerRadius,innerRadius);
         outerFalloffRadius = Mathf.Max(outerFalloffRadius,outerRadius);
 
         innerFalloffFactor = 1f / (innerRadius - innerFalloffRadius);
