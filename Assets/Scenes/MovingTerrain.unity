@@ -4594,6 +4594,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 4548414025430605619, guid: ee47b5cfaadddcb468b3205853fb5029, type: 3}
+      propertyPath: m_Interpolate
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: ee47b5cfaadddcb468b3205853fb5029, type: 3}
 --- !u!4 &207155294 stripped
@@ -4729,7 +4733,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!95 &316787013
 Animator:
   serializedVersion: 3
@@ -6145,7 +6149,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   gravity: 9.81
-  range: 1
+  range: 5
 --- !u!4 &588903757
 Transform:
   m_ObjectHideFlags: 0
@@ -6154,7 +6158,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 588903755}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: 0, y: 5, z: 0}
   m_LocalScale: {x: 100, y: 1, z: 100}
   m_Children: []
   m_Father: {fileID: 0}
@@ -6698,7 +6702,7 @@ Mesh:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: pb_Mesh11886
+  m_Name: pb_Mesh17430
   serializedVersion: 10
   m_SubMeshes:
   - serializedVersion: 2
@@ -9912,7 +9916,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!95 &1548097853
 Animator:
   serializedVersion: 3
@@ -9923,7 +9927,7 @@ Animator:
   m_GameObject: {fileID: 1548097852}
   m_Enabled: 1
   m_Avatar: {fileID: 0}
-  m_Controller: {fileID: 9100000, guid: bade85afe992e4b108ee5b63527c557b, type: 2}
+  m_Controller: {fileID: 9100000, guid: d5bdc3bc16a2d7e409443d642b5c92df, type: 2}
   m_CullingMode: 0
   m_UpdateMode: 1
   m_ApplyRootMotion: 0
@@ -10235,7 +10239,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1548097852}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: 0, y: 1.84, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
