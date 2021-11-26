@@ -108,7 +108,8 @@ public class MovingSphere : MonoBehaviour
 
     //platforms are kinematic animated, so their velocity is always zero,
     //so velocityCOnnection has to be calculated
-    Vector3 connectionWorldPosition;
+    //also tracking connection position in local space for rotating connections
+    Vector3 connectionWorldPosition, connectionLocalPosition;
 
     bool desiredJump;
 
@@ -241,12 +242,17 @@ public class MovingSphere : MonoBehaviour
         //if the body is still in contact with the same body
         if (connectedBody==previousConnectedBody)
         {
-            //calculate the movement direction
-            Vector3 connectionMovement = connectedBody.position - connectionWorldPosition;
+            //calculate the movement direction by converting local postion back to world space,
+            //using the current transform of the connected body
+            //if thre isnt a rotation the result is the same, if thre is orbit is now take into account
+            Vector3 connectionMovement = connectedBody.transform.TransformPoint(connectionLocalPosition) - connectionWorldPosition;
             //and the velocity
             connectionVelocity = connectionMovement / Time.deltaTime;
         }
-        connectionWorldPosition = connectedBody.position;
+        //Using player connection position in world space, instead of connections' position
+        connectionWorldPosition = body.position;
+        //connection local position is the same point but ins connection body's local space
+        connectionLocalPosition = connectedBody.transform.InverseTransformPoint(connectionWorldPosition);
     }
 
     void Jump(Vector3 gravity)
