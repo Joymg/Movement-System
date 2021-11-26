@@ -61,7 +61,7 @@ public class MovingSphere : MonoBehaviour
     [SerializeField]
     LayerMask stairsMask = -1;
 
-    Vector3 velocity, desiredVelocity;
+    Vector3 velocity, desiredVelocity, connectionVelocity;
     /// <summary>
     /// Saves the surface's normal that is in contact with
     /// </summary>
@@ -102,8 +102,16 @@ public class MovingSphere : MonoBehaviour
 
     Rigidbody body;
 
-    bool desiredJump;
+    //to move along with the body is connected with,
+    //is needed to know if the sphere remained in contact with the same body the prevous step 
+    Rigidbody connectedBody, previousConnectedBody;
 
+    //platforms are kinematic animated, so their velocity is always zero,
+    //so velocityCOnnection has to be calculated
+    //also tracking connection position in local space for rotating connections
+    Vector3 connectionWorldPosition, connectionLocalPosition;
+
+    bool desiredJump;
 
     int groundContactCount;
     bool IsGrounded => groundContactCount > 0;
@@ -205,12 +213,46 @@ public class MovingSphere : MonoBehaviour
         {
             contactNormal = upAxis;
         }
+
+        //if there is a connection with another object update the connection
+        if (connectedBody)
+        {
+            //only id the body is kinematic or at least as massive as the sphere
+            if (connectedBody.isKinematic || connectedBody.mass >= body.mass)
+            {
+                UpdateConnectionState();
+            }
+        }
     }
 
     private void ClearState()
     {
         groundContactCount = steepContactCount =0;
-        contactNormal = steepNormal =  Vector3.zero;
+        contactNormal = steepNormal = connectionVelocity = Vector3.zero;
+
+        //savinf connectBody before resetting it
+        previousConnectedBody = connectedBody;
+
+        //reset connected body
+        connectedBody = null;
+    }
+
+    private void UpdateConnectionState()
+    {
+        //if the body is still in contact with the same body
+        if (connectedBody==previousConnectedBody)
+        {
+            //calculate the movement direction by converting local postion back to world space,
+            //using the current transform of the connected body
+            //if thre isnt a rotation the result is the same, if thre is orbit is now take into account
+            Vector3 connectionMovement = connectedBody.transform.TransformPoint(connectionLocalPosition) - connectionWorldPosition;
+            //and the velocity
+            connectionVelocity = connectionMovement / Time.deltaTime;
+        }
+        //Using player connection position in world space, instead of connections' position
+        connectionWorldPosition = body.position;
+        //connection local position is the same point but ins connection body's local space
+        connectionLocalPosition = connectedBody.transform.InverseTransformPoint(connectionWorldPosition);
     }
 
     void Jump(Vector3 gravity)
@@ -317,6 +359,8 @@ public class MovingSphere : MonoBehaviour
             velocity = (velocity - hit.normal * dot).normalized * speed;
         }
 
+        //if we are snapping to ground we save the connected body
+        connectedBody = hit.rigidbody;
         return true;
     }
 
@@ -355,6 +399,9 @@ public class MovingSphere : MonoBehaviour
                 //save surfaces's normal
                 //and acummulate them if ther is more than one in contact
                 contactNormal += normal;
+
+                //if the the ground the sphere is contact with has a rigidbody is assigned directly, otherwise is set tu null
+                connectedBody = collision.rigidbody;
             }
 
             //If the contact is not with ground check if it is with a wall,
@@ -365,6 +412,13 @@ public class MovingSphere : MonoBehaviour
                 //save steep's normal
                 //and acummulate them if ther is more than one in contact
                 steepNormal += normal;
+
+                //if sphre ends up in a slope, but ground shold be preferred over slopes,
+                //so only assing slope body if there is not a ground contact
+                if (groundContactCount == 0)
+                {
+                    connectedBody = collision.rigidbody;
+                }
             }
         }
     }
@@ -395,9 +449,12 @@ public class MovingSphere : MonoBehaviour
         Vector3 xAxis = ProjectOnContactPlane(rightAxis,contactNormal);
         Vector3 zAxis = ProjectOnContactPlane(forwardAxis,contactNormal);
 
+        //At this point, isalready known the velocity of what is under the body
+        Vector3 relativeVelocity = velocity - connectionVelocity;
+
         //project currentvelocity on both vectors to get relatives speeds
-        float currentX = Vector3.Dot(velocity, xAxis);
-        float currentZ = Vector3.Dot(velocity, zAxis);
+        float currentX = Vector3.Dot(relativeVelocity, xAxis);
+        float currentZ = Vector3.Dot(relativeVelocity, zAxis);
 
         //make air movement different from ground movement
         float acceleration = IsGrounded ? maxAcceleration : maxAirAcceleration;
