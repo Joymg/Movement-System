@@ -149,7 +149,7 @@ public class MovingSphere : MonoBehaviour
 
     int climbContactCount;
 
-    bool IsClimbing => climbContactCount > 0;
+    bool IsClimbing => climbContactCount > 0 && stepsSinceLastJump > 2;
 
     MeshRenderer meshRenderer;
 
@@ -211,10 +211,12 @@ public class MovingSphere : MonoBehaviour
             Jump(gravity);
         }
 
-        //gravity is ignored when climbing, but control is lost
-        if (!IsClimbing)
+        if (IsClimbing)
         {
-            //applying the gravity
+            velocity -= contactNormal * (maxClimbAcceleration*0.9f * Time.deltaTime);
+        }
+        else
+        {
             velocity += gravity * Time.deltaTime;
         }
 
