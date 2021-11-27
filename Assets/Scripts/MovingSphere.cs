@@ -32,10 +32,16 @@ public class MovingSphere : MonoBehaviour
     float maxGroundAngle = 25f;
 
     /// <summary>
-    /// Angle 
+    /// Max angle of stais that can be walked on
     /// </summary>
     [SerializeField, Range(0f, 90f)]
     float maxStairsAngle = 50f;
+
+    /// <summary>
+    /// Max wall's angle that can be climbed
+    /// </summary>
+    [SerializeField, Range(90, 180)]
+    float maxClimbAngle = 140f;
 
     /// <summary>
     /// Max speed at which the sphere will snap to ground (shold be a bit higher than maxSpeed)
@@ -73,6 +79,11 @@ public class MovingSphere : MonoBehaviour
     Vector3 steepNormal;
 
     /// <summary>
+    /// Saves the surface's normal is in contact with when climbing
+    /// </summary>
+    Vector3 climbNormal;
+
+    /// <summary>
     /// Y axis won't be up and down strictly, now can be modified
     /// </summary>
     Vector3 upAxis;
@@ -89,6 +100,7 @@ public class MovingSphere : MonoBehaviour
 
     float minGroundDotProduct;
     float minStairsDotProduct;
+    float minClimbDotProduct;
 
     /// <summary>
     /// Keeps track of how many physic steps since the sphere was in ground
@@ -119,6 +131,10 @@ public class MovingSphere : MonoBehaviour
     int steepContactCount;
     bool OnSteep => steepContactCount > 0;
 
+    int climbContactCount;
+
+    bool IsClimbing => climbContactCount > 0;
+
     private void Awake()
     {
         body = GetComponent<Rigidbody>();
@@ -131,6 +147,7 @@ public class MovingSphere : MonoBehaviour
     {
         minGroundDotProduct = Mathf.Cos(maxGroundAngle * Mathf.Deg2Rad);
         minStairsDotProduct = Mathf.Cos(maxStairsAngle * Mathf.Deg2Rad);
+        minClimbDotProduct = Mathf.Cos(maxClimbAngle * Mathf.Deg2Rad);
     }
 
 
@@ -227,8 +244,9 @@ public class MovingSphere : MonoBehaviour
 
     private void ClearState()
     {
-        groundContactCount = steepContactCount =0;
-        contactNormal = steepNormal = connectionVelocity = Vector3.zero;
+        groundContactCount = steepContactCount= climbContactCount =0;
+        contactNormal = steepNormal = climbNormal = Vector3.zero;
+        connectionVelocity = Vector3.zero;
 
         //savinf connectBody before resetting it
         previousConnectedBody = connectedBody;
@@ -406,17 +424,28 @@ public class MovingSphere : MonoBehaviour
 
             //If the contact is not with ground check if it is with a wall,
             //0.01 just in case wall is not perfectly vertical
-            else if(upDot > -0.01f)
+            else
             {
-                steepContactCount += 1;
-                //save steep's normal
-                //and acummulate them if ther is more than one in contact
-                steepNormal += normal;
-
-                //if sphre ends up in a slope, but ground shold be preferred over slopes,
-                //so only assing slope body if there is not a ground contact
-                if (groundContactCount == 0)
+                if (upDot > -0.01f)
                 {
+                    steepContactCount += 1;
+                    //save steep's normal
+                    //and acummulate them if ther is more than one in contact
+                    steepNormal += normal;
+
+                    //if sphre ends up in a slope, but ground shold be preferred over slopes,
+                    //so only assing slope body if there is not a ground contact
+                    if (groundContactCount == 0)
+                    {
+                        connectedBody = collision.rigidbody;
+                    }
+                }
+                //if contact does not count as ground nor a wall, check for a climb
+                if (upDot >= minClimbDotProduct)
+                {
+                    climbContactCount += 1;
+                    climbNormal += normal;
+                    //looking for rigidbody to be able to climb to moving platforms
                     connectedBody = collision.rigidbody;
                 }
             }
