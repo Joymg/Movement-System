@@ -211,6 +211,7 @@ public class MovingSphere : MonoBehaviour
             Jump(gravity);
         }
 
+        //gravity is ignored when climbing, but control is lost
         if (!IsClimbing)
         {
             //applying the gravity
@@ -512,9 +513,24 @@ public class MovingSphere : MonoBehaviour
 
     void AdjustVelocity()
     {
+        Vector3 xAxis, zAxis;
+
+        //if climbing
+        if (IsClimbing)
+        {
+            //make movement relative to wall and gravity, ignoring camera orientation
+            xAxis = Vector3.Cross(contactNormal, upAxis);
+            zAxis = upAxis;
+        }
+        else
+        {
+            xAxis = rightAxis;
+            zAxis = forwardAxis;
+        }
+
         //Determine projected axes by projecting vectors on contact plane
-        Vector3 xAxis = ProjectOnContactPlane(rightAxis,contactNormal);
-        Vector3 zAxis = ProjectOnContactPlane(forwardAxis,contactNormal);
+        xAxis = ProjectOnContactPlane(rightAxis,contactNormal);
+        zAxis = ProjectOnContactPlane(forwardAxis,contactNormal);
 
         //At this point, isalready known the velocity of what is under the body
         Vector3 relativeVelocity = velocity - connectionVelocity;
