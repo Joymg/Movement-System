@@ -139,7 +139,7 @@ public class MovingSphere : MonoBehaviour
     //also tracking connection position in local space for rotating connections
     Vector3 connectionWorldPosition, connectionLocalPosition;
 
-    bool desiredJump;
+    bool desiredJump, desiresClimb;
 
     int groundContactCount;
     bool IsGrounded => groundContactCount > 0;
@@ -149,6 +149,7 @@ public class MovingSphere : MonoBehaviour
 
     int climbContactCount;
 
+    //turning off climbing if we just jumped
     bool IsClimbing => climbContactCount > 0 && stepsSinceLastJump > 2;
 
     MeshRenderer meshRenderer;
@@ -192,6 +193,7 @@ public class MovingSphere : MonoBehaviour
         }
 
         desiredJump |= Input.GetButtonDown("Jump");
+        desiresClimb |= Input.GetButtonDown("Climb");
 
         meshRenderer.material = IsClimbing ? climbingMaterial : normalMaterial;
 
@@ -482,7 +484,7 @@ public class MovingSphere : MonoBehaviour
                 }
                 //if contact does not count as ground nor a wall, check for a climb
                 //only including the climb if it isnt masked
-                if (upDot >= minClimbDotProduct && (climbMask & (1 << layer))!= 0)
+                if (desiresClimb && upDot >= minClimbDotProduct && (climbMask & (1 << layer))!= 0)
                 {
                     climbContactCount += 1;
                     climbNormal += normal;
