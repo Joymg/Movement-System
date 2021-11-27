@@ -13,11 +13,12 @@ public class MovingSphere : MonoBehaviour
     [SerializeField]
     Transform playerInputSpace = default;
 
-    [SerializeField, Range(0f, 100f)]
-    float maxAcceleration = 10f, maxAirAcceleration = 1f;
 
     [SerializeField, Range(0f, 100f)]
-    float maxSpeed = 10f;
+    float maxSpeed = 10f, maxClimbSpeed = 2f;
+
+    [SerializeField, Range(0f, 100f)]
+    float maxAcceleration = 10f, maxAirAcceleration = 1f, maxClimbAcceleration = 20f;
 
     [SerializeField, Range(0f, 10f)]
     float jumpHeight = 2f;
@@ -32,10 +33,16 @@ public class MovingSphere : MonoBehaviour
     float maxGroundAngle = 25f;
 
     /// <summary>
-    /// Angle 
+    /// Max angle of stais that can be walked on
     /// </summary>
     [SerializeField, Range(0f, 90f)]
     float maxStairsAngle = 50f;
+
+    /// <summary>
+    /// Max wall's angle that can be climbed
+    /// </summary>
+    [SerializeField, Range(90, 180)]
+    float maxClimbAngle = 140f;
 
     /// <summary>
     /// Max speed at which the sphere will snap to ground (shold be a bit higher than maxSpeed)
@@ -56,12 +63,27 @@ public class MovingSphere : MonoBehaviour
     LayerMask probeMask = -1;
 
     /// <summary>
-    /// Layer used to detct collisions with stairs
+    /// Layer used to detect collisions with stairs
     /// </summary>
     [SerializeField]
     LayerMask stairsMask = -1;
 
-    Vector3 velocity, desiredVelocity, connectionVelocity;
+    /// <summary>
+    /// Layer used to detect collinsions with climbable elements
+    /// </summary>
+    [SerializeField]
+    LayerMask climbMask = -1;
+
+    /// <summary>
+    /// Saving different materiasl to distinguissh from normal movement or climbing
+    /// </summary>
+    [SerializeField]
+    Material normalMaterial = default, climbingMaterial = default;
+
+    Vector2 playerInput;
+
+    Vector3 velocity, connectionVelocity;
+
     /// <summary>
     /// Saves the surface's normal that is in contact with
     /// </summary>
@@ -71,6 +93,13 @@ public class MovingSphere : MonoBehaviour
     /// Saves the Steeps's normal that is in contact with
     /// </summary>
     Vector3 steepNormal;
+
+    /// <summary>
+    /// Saves the surface's normal is in contact with when climbing
+    /// </summary>
+    Vector3 climbNormal;
+
+    Vector3 lastClimbNormal;
 
     /// <summary>
     /// Y axis won't be up and down strictly, now can be modified
@@ -89,6 +118,7 @@ public class MovingSphere : MonoBehaviour
 
     float minGroundDotProduct;
     float minStairsDotProduct;
+    float minClimbDotProduct;
 
     /// <summary>
     /// Keeps track of how many physic steps since the sphere was in ground
@@ -111,7 +141,7 @@ public class MovingSphere : MonoBehaviour
     //also tracking connection position in local space for rotating connections
     Vector3 connectionWorldPosition, connectionLocalPosition;
 
-    bool desiredJump;
+    bool desiredJump, desiresClimb;
 
     int groundContactCount;
     bool IsGrounded => groundContactCount > 0;
@@ -119,11 +149,19 @@ public class MovingSphere : MonoBehaviour
     int steepContactCount;
     bool OnSteep => steepContactCount > 0;
 
+    int climbContactCount;
+
+    //turning off climbing if we just jumped
+    bool IsClimbing => climbContactCount > 0 && stepsSinceLastJump > 2;
+
+    MeshRenderer meshRenderer;
+
     private void Awake()
     {
         body = GetComponent<Rigidbody>();
         //cause we are use custom gravity, RB gravity is desactivated
         body.useGravity = false;
+        meshRenderer = GetComponent<MeshRenderer>();
         OnValidate();
     }
 
@@ -131,13 +169,13 @@ public class MovingSphere : MonoBehaviour
     {
         minGroundDotProduct = Mathf.Cos(maxGroundAngle * Mathf.Deg2Rad);
         minStairsDotProduct = Mathf.Cos(maxStairsAngle * Mathf.Deg2Rad);
+        minClimbDotProduct = Mathf.Cos(maxClimbAngle * Mathf.Deg2Rad);
     }
 
 
     private void Update()
     {
 
-        Vector2 playerInput;
         playerInput.x = Input.GetAxis("Horizontal");
         playerInput.y = Input.GetAxis("Vertical");
         playerInput = Vector2.ClampMagnitude(playerInput, 1f);
@@ -156,10 +194,11 @@ public class MovingSphere : MonoBehaviour
             forwardAxis = ProjectOnContactPlane(Vector3.forward, upAxis);
         }
 
-            //Setting Desired Velocity
-        desiredVelocity = new Vector3(playerInput.x, 0f, playerInput.y) * maxSpeed;
-
         desiredJump |= Input.GetButtonDown("Jump");
+        desiresClimb = Input.GetButton("Climb");
+        Debug.Log(desiresClimb);
+
+        meshRenderer.material = IsClimbing ? climbingMaterial : normalMaterial;
 
     }
     private void FixedUpdate()
@@ -177,8 +216,28 @@ public class MovingSphere : MonoBehaviour
             Jump(gravity);
         }
 
-        //applying the gravity
-        velocity += gravity * Time.deltaTime;
+        if (IsClimbing)
+        {
+            velocity -= contactNormal * (maxClimbAcceleration * 0.9f * Time.deltaTime);
+        }
+
+        else if (IsGrounded && velocity.sqrMagnitude < 0.01f)
+        {
+            velocity +=
+                contactNormal *
+                (Vector3.Dot(gravity, contactNormal) * Time.deltaTime);
+        }
+        else if (desiresClimb && IsGrounded)
+        {
+            velocity +=
+                (gravity - contactNormal * (maxClimbAcceleration * 0.9f)) *
+                Time.deltaTime;
+        }
+        else
+        {
+            velocity += gravity * Time.deltaTime;
+        }
+
         body.velocity = velocity;
 
         ClearState();
@@ -193,7 +252,7 @@ public class MovingSphere : MonoBehaviour
         velocity = body.velocity;
 
         //if not on the ground call SnapToground
-        if (IsGrounded || SnapToGround() || CheckSteepContacts())
+        if (CheckCkimbing()|| IsGrounded || SnapToGround() || CheckSteepContacts())
         {
             stepsSinceLastGrounded = 0;
             //checking if jumpPhase is less than maxAirJumps only works beacuse pahse is set back to zero directly after the jump
@@ -227,8 +286,9 @@ public class MovingSphere : MonoBehaviour
 
     private void ClearState()
     {
-        groundContactCount = steepContactCount =0;
-        contactNormal = steepNormal = connectionVelocity = Vector3.zero;
+        groundContactCount = steepContactCount= climbContactCount =0;
+        contactNormal = steepNormal = climbNormal = Vector3.zero;
+        connectionVelocity = Vector3.zero;
 
         //savinf connectBody before resetting it
         previousConnectedBody = connectedBody;
@@ -365,6 +425,30 @@ public class MovingSphere : MonoBehaviour
     }
 
     /// <summary>
+    /// Switches to climb mode, sticking to the surface and moving relative to it
+    /// </summary>
+    /// <returns>If climbing is posible</returns>
+    bool CheckCkimbing()
+    {
+        if (IsClimbing)
+        {
+            if (climbContactCount > 1)
+            {
+                climbNormal.Normalize();
+                float upDot = Vector3.Dot(upAxis, climbNormal);
+                if (upDot >= minGroundDotProduct)
+                {
+                    climbNormal = lastClimbNormal;
+                }
+            }
+            groundContactCount = 1;
+            contactNormal = climbNormal;
+            return true;
+        }
+        return false;
+    }
+
+    /// <summary>
     /// Determines the appropiete minimun given a layer
     /// </summary>
     /// <param name="layer">A</param>
@@ -388,6 +472,7 @@ public class MovingSphere : MonoBehaviour
 
     private void EvaluateCollision(Collision collision)
     {
+        int layer = collision.gameObject.layer;
         float minDot = GetMinDot(collision.gameObject.layer);
         for (int i = 0; i < collision.contactCount; i++)
         {
@@ -406,17 +491,30 @@ public class MovingSphere : MonoBehaviour
 
             //If the contact is not with ground check if it is with a wall,
             //0.01 just in case wall is not perfectly vertical
-            else if(upDot > -0.01f)
+            else
             {
-                steepContactCount += 1;
-                //save steep's normal
-                //and acummulate them if ther is more than one in contact
-                steepNormal += normal;
-
-                //if sphre ends up in a slope, but ground shold be preferred over slopes,
-                //so only assing slope body if there is not a ground contact
-                if (groundContactCount == 0)
+                if (upDot > -0.01f)
                 {
+                    steepContactCount += 1;
+                    //save steep's normal
+                    //and acummulate them if ther is more than one in contact
+                    steepNormal += normal;
+
+                    //if sphre ends up in a slope, but ground shold be preferred over slopes,
+                    //so only assing slope body if there is not a ground contact
+                    if (groundContactCount == 0)
+                    {
+                        connectedBody = collision.rigidbody;
+                    }
+                }
+                //if contact does not count as ground nor a wall, check for a climb
+                //only including the climb if it isnt masked
+                if (desiresClimb && upDot >= minClimbDotProduct && (climbMask & (1 << layer))!= 0)
+                {
+                    climbContactCount += 1;
+                    climbNormal += normal;
+                    lastClimbNormal = normal;
+                    //looking for rigidbody to be able to climb to moving platforms
                     connectedBody = collision.rigidbody;
                 }
             }
@@ -426,7 +524,6 @@ public class MovingSphere : MonoBehaviour
     /// <summary>
     /// in case of been stuck in a crevasse use its steeps normals by pushing against those contact points 
     /// </summary>
-
     bool CheckSteepContacts()
     {
         if (steepContactCount > 1)
@@ -445,9 +542,29 @@ public class MovingSphere : MonoBehaviour
 
     void AdjustVelocity()
     {
+        float acceleration, speed;
+        Vector3 xAxis, zAxis;
+
+        //if climbing
+        if (IsClimbing)
+        {
+            acceleration = maxClimbAcceleration;
+            speed = maxClimbSpeed;
+            //make movement relative to wall and gravity, ignoring camera orientation
+            xAxis = Vector3.Cross(contactNormal, upAxis);
+            zAxis = upAxis;
+        }
+        else
+        {
+            acceleration = IsGrounded ? maxAcceleration : maxAirAcceleration;
+            speed = IsGrounded && desiresClimb ? maxClimbSpeed : maxSpeed;
+            xAxis = rightAxis;
+            zAxis = forwardAxis;
+        }
+
         //Determine projected axes by projecting vectors on contact plane
-        Vector3 xAxis = ProjectOnContactPlane(rightAxis,contactNormal);
-        Vector3 zAxis = ProjectOnContactPlane(forwardAxis,contactNormal);
+        xAxis = ProjectOnContactPlane(xAxis,contactNormal);
+        zAxis = ProjectOnContactPlane(zAxis,contactNormal);
 
         //At this point, isalready known the velocity of what is under the body
         Vector3 relativeVelocity = velocity - connectionVelocity;
@@ -456,16 +573,14 @@ public class MovingSphere : MonoBehaviour
         float currentX = Vector3.Dot(relativeVelocity, xAxis);
         float currentZ = Vector3.Dot(relativeVelocity, zAxis);
 
-        //make air movement different from ground movement
-        float acceleration = IsGrounded ? maxAcceleration : maxAirAcceleration;
         //find maximum speed change this update
         float maxSpeedChange = acceleration * Time.deltaTime;
 
         //calculate new speeds relatives to ground
         float newX =
-            Mathf.MoveTowards(currentX, desiredVelocity.x, maxSpeedChange);
+            Mathf.MoveTowards(currentX, playerInput.x * speed, maxSpeedChange);
         float newZ =
-            Mathf.MoveTowards(currentZ, desiredVelocity.z, maxSpeedChange);
+            Mathf.MoveTowards(currentZ, playerInput.y * speed, maxSpeedChange);
 
         //adjust velocity bya dding differences between new and old speeds
         velocity += xAxis * (newX - currentX) + zAxis * (newZ - currentZ);

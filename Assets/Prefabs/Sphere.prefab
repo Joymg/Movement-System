@@ -208,13 +208,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a379f181959196247a4c14a76efa2281, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  maxAcceleration: 20
-  maxAirAcceleration: 1
+  playerInputSpace: {fileID: 0}
   maxSpeed: 10
-  jumpHeight: 2
-  maxAirJumps: 0
+  maxClimbSpeed: 4
+  maxAcceleration: 10
+  maxAirAcceleration: 0
+  maxClimbAcceleration: 40
+  jumpHeight: 3
+  maxAirJumps: 2
   maxGroundAngle: 40
   maxStairsAngle: 50
+  maxClimbAngle: 140
   maxSnapSpeed: 100
   probeDistance: 1
   probeMask:
@@ -223,6 +227,11 @@ MonoBehaviour:
   stairsMask:
     serializedVersion: 2
     m_Bits: 1024
+  climbMask:
+    serializedVersion: 2
+    m_Bits: 1331
+  normalMaterial: {fileID: 2100000, guid: c72677f29ca9dc741beca9e384cef6de, type: 2}
+  climbingMaterial: {fileID: 2100000, guid: b3dffac609ba1854d8dd8f20294fcab0, type: 2}
 --- !u!54 &4548414025430605619
 Rigidbody:
   m_ObjectHideFlags: 0
