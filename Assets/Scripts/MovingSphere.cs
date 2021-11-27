@@ -217,6 +217,12 @@ public class MovingSphere : MonoBehaviour
         {
             velocity -= contactNormal * (maxClimbAcceleration*0.9f * Time.deltaTime);
         }
+        else if (desiresClimb && IsGrounded)
+        {
+            velocity +=
+                (gravity - contactNormal * (maxClimbAcceleration * 0.9f)) *
+                Time.deltaTime;
+        }
         else
         {
             velocity += gravity * Time.deltaTime;
@@ -532,7 +538,7 @@ public class MovingSphere : MonoBehaviour
         else
         {
             acceleration = IsGrounded ? maxAcceleration : maxAirAcceleration;
-            speed = maxSpeed;
+            speed = IsGrounded && desiresClimb ? maxClimbSpeed : maxSpeed;
             xAxis = rightAxis;
             zAxis = forwardAxis;
         }
