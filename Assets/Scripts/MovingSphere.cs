@@ -73,6 +73,12 @@ public class MovingSphere : MonoBehaviour
     [SerializeField]
     LayerMask climbMask = -1;
 
+    /// <summary>
+    /// Saving different materiasl to distinguissh from normal movement or climbing
+    /// </summary>
+    [SerializeField]
+    Material normalMaterial = default, climbingMaterial = default;
+
     Vector3 velocity, desiredVelocity, connectionVelocity;
     /// <summary>
     /// Saves the surface's normal that is in contact with
@@ -141,11 +147,14 @@ public class MovingSphere : MonoBehaviour
 
     bool IsClimbing => climbContactCount > 0;
 
+    MeshRenderer meshRenderer;
+
     private void Awake()
     {
         body = GetComponent<Rigidbody>();
         //cause we are use custom gravity, RB gravity is desactivated
         body.useGravity = false;
+        meshRenderer = GetComponent<MeshRenderer>();
         OnValidate();
     }
 
@@ -183,6 +192,8 @@ public class MovingSphere : MonoBehaviour
         desiredVelocity = new Vector3(playerInput.x, 0f, playerInput.y) * maxSpeed;
 
         desiredJump |= Input.GetButtonDown("Jump");
+
+        meshRenderer.material = IsClimbing ? climbingMaterial : normalMaterial;
 
     }
     private void FixedUpdate()
