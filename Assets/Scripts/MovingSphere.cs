@@ -99,6 +99,8 @@ public class MovingSphere : MonoBehaviour
     /// </summary>
     Vector3 climbNormal;
 
+    Vector3 lastClimbNormal;
+
     /// <summary>
     /// Y axis won't be up and down strictly, now can be modified
     /// </summary>
@@ -193,7 +195,8 @@ public class MovingSphere : MonoBehaviour
         }
 
         desiredJump |= Input.GetButtonDown("Jump");
-        desiresClimb |= Input.GetButtonDown("Climb");
+        desiresClimb = Input.GetButton("Climb");
+        Debug.Log(desiresClimb);
 
         meshRenderer.material = IsClimbing ? climbingMaterial : normalMaterial;
 
@@ -429,7 +432,16 @@ public class MovingSphere : MonoBehaviour
     {
         if (IsClimbing)
         {
-            groundContactCount = climbContactCount;
+            if (climbContactCount > 1)
+            {
+                climbNormal.Normalize();
+                float upDot = Vector3.Dot(upAxis, climbNormal);
+                if (upDot >= minGroundDotProduct)
+                {
+                    climbNormal = lastClimbNormal;
+                }
+            }
+            groundContactCount = 1;
             contactNormal = climbNormal;
             return true;
         }
@@ -501,6 +513,7 @@ public class MovingSphere : MonoBehaviour
                 {
                     climbContactCount += 1;
                     climbNormal += normal;
+                    lastClimbNormal = normal;
                     //looking for rigidbody to be able to climb to moving platforms
                     connectedBody = collision.rigidbody;
                 }
@@ -511,7 +524,6 @@ public class MovingSphere : MonoBehaviour
     /// <summary>
     /// in case of been stuck in a crevasse use its steeps normals by pushing against those contact points 
     /// </summary>
-
     bool CheckSteepContacts()
     {
         if (steepContactCount > 1)
@@ -551,8 +563,8 @@ public class MovingSphere : MonoBehaviour
         }
 
         //Determine projected axes by projecting vectors on contact plane
-        xAxis = ProjectOnContactPlane(rightAxis,contactNormal);
-        zAxis = ProjectOnContactPlane(forwardAxis,contactNormal);
+        xAxis = ProjectOnContactPlane(xAxis,contactNormal);
+        zAxis = ProjectOnContactPlane(zAxis,contactNormal);
 
         //At this point, isalready known the velocity of what is under the body
         Vector3 relativeVelocity = velocity - connectionVelocity;
