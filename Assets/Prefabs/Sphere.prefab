@@ -209,9 +209,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   playerInputSpace: {fileID: 0}
-  maxAcceleration: 20
-  maxAirAcceleration: 1
   maxSpeed: 10
+  maxClimbSpeed: 4
+  maxAcceleration: 10
+  maxAirAcceleration: 0
+  maxClimbAcceleration: 40
   jumpHeight: 3
   maxAirJumps: 2
   maxGroundAngle: 40

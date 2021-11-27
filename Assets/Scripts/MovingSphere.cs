@@ -13,11 +13,12 @@ public class MovingSphere : MonoBehaviour
     [SerializeField]
     Transform playerInputSpace = default;
 
-    [SerializeField, Range(0f, 100f)]
-    float maxAcceleration = 10f, maxAirAcceleration = 1f;
 
     [SerializeField, Range(0f, 100f)]
-    float maxSpeed = 10f;
+    float maxSpeed = 10f, maxClimbSpeed = 2f;
+
+    [SerializeField, Range(0f, 100f)]
+    float maxAcceleration = 10f, maxAirAcceleration = 1f, maxClimbAcceleration = 20f;
 
     [SerializeField, Range(0f, 10f)]
     float jumpHeight = 2f;
@@ -79,7 +80,10 @@ public class MovingSphere : MonoBehaviour
     [SerializeField]
     Material normalMaterial = default, climbingMaterial = default;
 
-    Vector3 velocity, desiredVelocity, connectionVelocity;
+    Vector2 playerInput;
+
+    Vector3 velocity, connectionVelocity;
+
     /// <summary>
     /// Saves the surface's normal that is in contact with
     /// </summary>
@@ -169,7 +173,6 @@ public class MovingSphere : MonoBehaviour
     private void Update()
     {
 
-        Vector2 playerInput;
         playerInput.x = Input.GetAxis("Horizontal");
         playerInput.y = Input.GetAxis("Vertical");
         playerInput = Vector2.ClampMagnitude(playerInput, 1f);
@@ -187,9 +190,6 @@ public class MovingSphere : MonoBehaviour
             rightAxis = ProjectOnContactPlane(Vector3.right, upAxis);
             forwardAxis = ProjectOnContactPlane(Vector3.forward, upAxis);
         }
-
-            //Setting Desired Velocity
-        desiredVelocity = new Vector3(playerInput.x, 0f, playerInput.y) * maxSpeed;
 
         desiredJump |= Input.GetButtonDown("Jump");
 
@@ -513,17 +513,22 @@ public class MovingSphere : MonoBehaviour
 
     void AdjustVelocity()
     {
+        float acceleration, speed;
         Vector3 xAxis, zAxis;
 
         //if climbing
         if (IsClimbing)
         {
+            acceleration = maxClimbAcceleration;
+            speed = maxClimbSpeed;
             //make movement relative to wall and gravity, ignoring camera orientation
             xAxis = Vector3.Cross(contactNormal, upAxis);
             zAxis = upAxis;
         }
         else
         {
+            acceleration = IsGrounded ? maxAcceleration : maxAirAcceleration;
+            speed = maxSpeed;
             xAxis = rightAxis;
             zAxis = forwardAxis;
         }
@@ -539,16 +544,14 @@ public class MovingSphere : MonoBehaviour
         float currentX = Vector3.Dot(relativeVelocity, xAxis);
         float currentZ = Vector3.Dot(relativeVelocity, zAxis);
 
-        //make air movement different from ground movement
-        float acceleration = IsGrounded ? maxAcceleration : maxAirAcceleration;
         //find maximum speed change this update
         float maxSpeedChange = acceleration * Time.deltaTime;
 
         //calculate new speeds relatives to ground
         float newX =
-            Mathf.MoveTowards(currentX, desiredVelocity.x, maxSpeedChange);
+            Mathf.MoveTowards(currentX, playerInput.x * speed, maxSpeedChange);
         float newZ =
-            Mathf.MoveTowards(currentZ, desiredVelocity.z, maxSpeedChange);
+            Mathf.MoveTowards(currentZ, playerInput.y * speed, maxSpeedChange);
 
         //adjust velocity bya dding differences between new and old speeds
         velocity += xAxis * (newX - currentX) + zAxis * (newZ - currentZ);
