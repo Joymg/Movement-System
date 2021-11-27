@@ -62,10 +62,16 @@ public class MovingSphere : MonoBehaviour
     LayerMask probeMask = -1;
 
     /// <summary>
-    /// Layer used to detct collisions with stairs
+    /// Layer used to detect collisions with stairs
     /// </summary>
     [SerializeField]
     LayerMask stairsMask = -1;
+
+    /// <summary>
+    /// Layer used to detect collinsions with climbable elements
+    /// </summary>
+    [SerializeField]
+    LayerMask climbMask = -1;
 
     Vector3 velocity, desiredVelocity, connectionVelocity;
     /// <summary>
@@ -406,6 +412,7 @@ public class MovingSphere : MonoBehaviour
 
     private void EvaluateCollision(Collision collision)
     {
+        int layer = collision.gameObject.layer;
         float minDot = GetMinDot(collision.gameObject.layer);
         for (int i = 0; i < collision.contactCount; i++)
         {
@@ -441,7 +448,8 @@ public class MovingSphere : MonoBehaviour
                     }
                 }
                 //if contact does not count as ground nor a wall, check for a climb
-                if (upDot >= minClimbDotProduct)
+                //only including the climb if it isnt masked
+                if (upDot >= minClimbDotProduct && (climbMask & (1 << layer))!= 0)
                 {
                     climbContactCount += 1;
                     climbNormal += normal;
