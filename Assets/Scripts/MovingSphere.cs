@@ -215,7 +215,14 @@ public class MovingSphere : MonoBehaviour
 
         if (IsClimbing)
         {
-            velocity -= contactNormal * (maxClimbAcceleration*0.9f * Time.deltaTime);
+            velocity -= contactNormal * (maxClimbAcceleration * 0.9f * Time.deltaTime);
+        }
+
+        else if (IsGrounded && velocity.sqrMagnitude < 0.01f)
+        {
+            velocity +=
+                contactNormal *
+                (Vector3.Dot(gravity, contactNormal) * Time.deltaTime);
         }
         else if (desiresClimb && IsGrounded)
         {
