@@ -211,8 +211,12 @@ public class MovingSphere : MonoBehaviour
             Jump(gravity);
         }
 
-        //applying the gravity
-        velocity += gravity * Time.deltaTime;
+        if (!IsClimbing)
+        {
+            //applying the gravity
+            velocity += gravity * Time.deltaTime;
+        }
+
         body.velocity = velocity;
 
         ClearState();
@@ -227,7 +231,7 @@ public class MovingSphere : MonoBehaviour
         velocity = body.velocity;
 
         //if not on the ground call SnapToground
-        if (IsGrounded || SnapToGround() || CheckSteepContacts())
+        if (CheckCkimbing()|| IsGrounded || SnapToGround() || CheckSteepContacts())
         {
             stepsSinceLastGrounded = 0;
             //checking if jumpPhase is less than maxAirJumps only works beacuse pahse is set back to zero directly after the jump
@@ -397,6 +401,21 @@ public class MovingSphere : MonoBehaviour
         //if we are snapping to ground we save the connected body
         connectedBody = hit.rigidbody;
         return true;
+    }
+
+    /// <summary>
+    /// Switches to climb mode, sticking to the surface and moving relative to it
+    /// </summary>
+    /// <returns>If climbing is posible</returns>
+    bool CheckCkimbing()
+    {
+        if (IsClimbing)
+        {
+            groundContactCount = climbContactCount;
+            contactNormal = climbNormal;
+            return true;
+        }
+        return false;
     }
 
     /// <summary>
