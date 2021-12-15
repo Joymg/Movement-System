@@ -32,5 +32,10 @@ public class LaunchPad : MonoBehaviour
 
         velocity.y = speed;
         rigidbody.velocity = velocity;
+
+        if (rigidbody.TryGetComponent(out MovingSphere player))
+        {
+            player.PreventSnapToGround();
+        }
     }
 }
