@@ -3,10 +3,10 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class LaunchPad : MonoBehaviour
+public class AccelerationZone : MonoBehaviour
 {
     [SerializeField, Min(0f)]
-    float speed = 10f;
+    float acceleration = 10f, speed = 10f;
 
 
     //When something enters the collider 
@@ -16,12 +16,21 @@ public class LaunchPad : MonoBehaviour
         if (rigidbody)
         {
             //it will get launched
-            Launch(rigidbody);
+            Accelerate(rigidbody);
+        }
+    }
+
+    private void OnTriggerStay(Collider other)
+    {
+        Rigidbody rigidbody = other.attachedRigidbody;
+        if (rigidbody)
+        {
+            Accelerate(rigidbody);
         }
     }
 
     //body will be launched with the determined speed
-    private void Launch(Rigidbody rigidbody)
+    private void Accelerate(Rigidbody rigidbody)
     {
         Vector3 velocity = rigidbody.velocity;
         //unless its velocity was already greater
@@ -30,7 +39,15 @@ public class LaunchPad : MonoBehaviour
             return;
         }
 
-        velocity.y = speed;
+        if (acceleration > 0f)
+        {
+            velocity.y = Mathf.MoveTowards(velocity.y, speed, acceleration * Time.deltaTime);
+        }
+        else
+        {
+            velocity.y = speed;
+        }
+
         rigidbody.velocity = velocity;
 
         if (rigidbody.TryGetComponent(out MovingSphere player))
