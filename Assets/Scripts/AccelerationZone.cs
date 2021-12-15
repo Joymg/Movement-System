@@ -32,7 +32,8 @@ public class AccelerationZone : MonoBehaviour
     //body will be launched with the determined speed
     private void Accelerate(Rigidbody rigidbody)
     {
-        Vector3 velocity = rigidbody.velocity;
+        //Converting rb velocity intos local coordinates of the launchpad
+        Vector3 velocity = transform.InverseTransformDirection(rigidbody.velocity);
         //unless its velocity was already greater
         if (velocity.y >= speed)
         {
@@ -48,7 +49,8 @@ public class AccelerationZone : MonoBehaviour
             velocity.y = speed;
         }
 
-        rigidbody.velocity = velocity;
+        //and converting it back to world coordinates when applying it
+        rigidbody.velocity = transform.TransformDirection(velocity);
 
         if (rigidbody.TryGetComponent(out MovingSphere player))
         {
