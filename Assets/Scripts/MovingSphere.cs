@@ -370,7 +370,6 @@ public class MovingSphere : MonoBehaviour
     }
 
     //keeps the sphere stuck to the ground,only invoked if in the air
-
     bool SnapToGround()
     {
         //We need to stick to the ground ritght when we lose connection with ground
@@ -422,6 +421,13 @@ public class MovingSphere : MonoBehaviour
         //if we are snapping to ground we save the connected body
         connectedBody = hit.rigidbody;
         return true;
+    }
+
+    //Called when using a launch pad, so the player does not stick to the ground
+    public void PreventSnapToGround()
+    {
+        //bouncing of launchpads does not resets airjumps
+        stepsSinceLastJump = -1;
     }
 
     /// <summary>
