@@ -17017,6 +17017,10 @@ PrefabInstance:
       propertyPath: waterMask.m_Bits
       value: 16
       objectReference: {fileID: 0}
+    - target: {fileID: 4548414025430605609, guid: ee47b5cfaadddcb468b3205853fb5029, type: 3}
+      propertyPath: maxAirAcceleration
+      value: 2
+      objectReference: {fileID: 0}
     - target: {fileID: 4548414025430605610, guid: ee47b5cfaadddcb468b3205853fb5029, type: 3}
       propertyPath: m_Name
       value: Sphere

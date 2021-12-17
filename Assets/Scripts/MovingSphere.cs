@@ -162,10 +162,22 @@ public class MovingSphere : MonoBehaviour
     //threshold is 2 to give some sapce and not beeig too rigid
     bool IsClimbing => climbContactCount > 0 && stepsSinceLastJump > 2;
 
+
+    /// <summary>
+    /// Keeps track of the sphere submergence state, 0 no water, 1 completely submerged
+    /// </summary>
+    float submergence;
+
+    [SerializeField]
+    float submergenceOffset = 0.5f;
+
+    [SerializeField, Min(0.1f)]
+    float submergenceRange = 1f;
+
     /// <summary>
     /// Indicates if the player is in the water
     /// </summary>
-    bool InWater { get; set; }
+    bool InWater => submergence > 0f;
 
     MeshRenderer meshRenderer;
 
@@ -215,8 +227,8 @@ public class MovingSphere : MonoBehaviour
         meshRenderer.material = 
             IsClimbing ? climbingMaterial : 
             InWater ? swimmingMaterial : normalMaterial;
-
     }
+
     private void FixedUpdate()
     {
         //adding suport for chaging gravity direction, it points in the opposite direction that gravity pulls
@@ -312,7 +324,7 @@ public class MovingSphere : MonoBehaviour
         //reset connected body
         connectedBody = null;
 
-        InWater = false;
+        submergence = 0f;
     }
 
     private void UpdateConnectionState()
@@ -625,7 +637,7 @@ public class MovingSphere : MonoBehaviour
     {
         if ((waterMask & (1 << other.gameObject.layer)) !=0 )
         {
-            InWater = true;
+            EvaluateSubmergence();
         }
     }
 
@@ -633,7 +645,27 @@ public class MovingSphere : MonoBehaviour
     {
         if ((waterMask & (1 << other.gameObject.layer)) != 0)
         {
-            InWater = true;
+            EvaluateSubmergence();
+        }
+    }
+
+    void EvaluateSubmergence()
+    {
+        //Increasing the length of the cast by small amount takes care of nearly all cases (except the ones moving really fast)
+        if (Physics.Raycast(body.position + upAxis * submergenceOffset,
+            -upAxis, out RaycastHit hit, submergenceRange + 1,
+            waterMask, QueryTriggerInteraction.Collide))
+        {
+            submergence = 1f - hit.distance / submergenceRange;
+
+        }
+
+        //submergence works until fully submerged, beacause the raycast is casted from inside the collider so it fails to hit
+        else
+        {
+            //subsenquently if it does not hit player is completely submerged
+            submergence = 1f;
+            //but this might coause a invalid submergence of 1 when exiting the water
         }
     }
 
