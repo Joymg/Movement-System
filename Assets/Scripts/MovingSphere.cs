@@ -75,10 +75,17 @@ public class MovingSphere : MonoBehaviour
     LayerMask climbMask = -1;
 
     /// <summary>
+    /// Layer used to detect collinsions with Water
+    /// </summary>
+    [SerializeField]
+    LayerMask waterMask = 0;
+
+
+    /// <summary>
     /// Saving different materiasl to distinguissh from normal movement or climbing
     /// </summary>
     [SerializeField]
-    Material normalMaterial = default, climbingMaterial = default;
+    Material normalMaterial = default, climbingMaterial = default, swimmingMaterial = default;
 
     Vector2 playerInput;
 
@@ -152,7 +159,13 @@ public class MovingSphere : MonoBehaviour
     int climbContactCount;
 
     //turning off climbing if we just jumped
+    //threshold is 2 to give some sapce and not beeig too rigid
     bool IsClimbing => climbContactCount > 0 && stepsSinceLastJump > 2;
+
+    /// <summary>
+    /// Indicates if the player is in the water
+    /// </summary>
+    bool InWater { get; set; }
 
     MeshRenderer meshRenderer;
 
@@ -198,7 +211,10 @@ public class MovingSphere : MonoBehaviour
         desiresClimb = Input.GetButton("Climb");
         Debug.Log(desiresClimb);
 
-        meshRenderer.material = IsClimbing ? climbingMaterial : normalMaterial;
+        //changing materials
+        meshRenderer.material = 
+            IsClimbing ? climbingMaterial : 
+            InWater ? swimmingMaterial : normalMaterial;
 
     }
     private void FixedUpdate()
@@ -295,6 +311,8 @@ public class MovingSphere : MonoBehaviour
 
         //reset connected body
         connectedBody = null;
+
+        InWater = false;
     }
 
     private void UpdateConnectionState()
@@ -601,6 +619,22 @@ public class MovingSphere : MonoBehaviour
     private Vector3 ProjectOnContactPlane(Vector3 vector,Vector3 normal)
     {
         return vector - contactNormal * Vector3.Dot(vector, contactNormal);
+    }
+
+    private void OnTriggerEnter(Collider other)
+    {
+        if ((waterMask & (1 << other.gameObject.layer)) !=0 )
+        {
+            InWater = true;
+        }
+    }
+
+    private void OnTriggerStay(Collider other)
+    {
+        if ((waterMask & (1 << other.gameObject.layer)) != 0)
+        {
+            InWater = true;
+        }
     }
 
 }

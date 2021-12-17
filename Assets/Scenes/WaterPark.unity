@@ -17009,6 +17009,14 @@ PrefabInstance:
       propertyPath: playerInputSpace
       value: 
       objectReference: {fileID: 963194228}
+    - target: {fileID: 4548414025430605609, guid: ee47b5cfaadddcb468b3205853fb5029, type: 3}
+      propertyPath: swimmingMaterial
+      value: 
+      objectReference: {fileID: 2100000, guid: d42d1e80631f49f409ce6062c6316427, type: 2}
+    - target: {fileID: 4548414025430605609, guid: ee47b5cfaadddcb468b3205853fb5029, type: 3}
+      propertyPath: waterMask.m_Bits
+      value: 16
+      objectReference: {fileID: 0}
     - target: {fileID: 4548414025430605610, guid: ee47b5cfaadddcb468b3205853fb5029, type: 3}
       propertyPath: m_Name
       value: Sphere
@@ -17090,9 +17098,11 @@ MonoBehaviour:
   m_GameObject: {fileID: 588903755}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 65287b85c159f40e1aeef513b1b0e4cf, type: 3}
+  m_Script: {fileID: 11500000, guid: 7daa4122120f69d489b5b0165eec7cd2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  gravity: 9.81
+  range: 10
 --- !u!4 &588903757
 Transform:
   m_ObjectHideFlags: 0
@@ -17102,7 +17112,7 @@ Transform:
   m_GameObject: {fileID: 588903755}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalScale: {x: 100, y: 1, z: 100}
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 4
