@@ -175,6 +175,18 @@ public class MovingSphere : MonoBehaviour
     float submergenceRange = 1f;
 
     /// <summary>
+    /// Value for the buoyancy or how much it floats
+    /// </summary>
+    [SerializeField, Min(0f)]
+    float buoyancy = 1f;
+
+    /// <summary>
+    /// Value of acceleration drag underwater
+    /// </summary>
+    [SerializeField, Range(0f, 10f)]
+    float waterDrag = 1f;
+
+    /// <summary>
     /// Indicates if the player is in the water
     /// </summary>
     bool InWater => submergence > 0f;
@@ -235,6 +247,13 @@ public class MovingSphere : MonoBehaviour
         Vector3 gravity = CustomGravity.GetGravity(body.position, out upAxis);
         UpdateState();
 
+        //linear dampening 
+        if (InWater)
+        {
+            //progressive drag, the more submerged the slower
+            velocity *= 1f - waterDrag *submergence* Time.deltaTime;
+        }
+
         AdjustVelocity();
         
 
@@ -247,6 +266,13 @@ public class MovingSphere : MonoBehaviour
         if (IsClimbing)
         {
             velocity -= contactNormal * (maxClimbAcceleration * 0.9f * Time.deltaTime);
+        }
+
+        else if(InWater)
+        {
+            //if under water gravity sacaled by 1 - buoyancy scaled by submergence is applied to velocity,
+            //overriding all other applications of gravity
+            velocity += gravity * ((1f - buoyancy * submergence) * Time.deltaTime);
         }
 
         else if (IsGrounded && velocity.sqrMagnitude < 0.01f)
@@ -407,7 +433,8 @@ public class MovingSphere : MonoBehaviour
 
         //If a jump is executed snapping is aborted, afeter jumping the sphere
         //is considered grounded for a few seconds, so a small delay is added just in case
-        if (stepsSinceLastGrounded > 1 || stepsSinceLastJump <= 2)
+        //if the player is under water it should not snap to ground
+        if (stepsSinceLastGrounded > 1 || stepsSinceLastJump <= 2 || InWater)
         {
             return false;
         }
