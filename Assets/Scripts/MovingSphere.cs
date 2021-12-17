@@ -388,7 +388,7 @@ public class MovingSphere : MonoBehaviour
         }
         //snapping will only be produced if there's ground below the sphere.
         //hit allows to check if the thing below the sphere counts as ground
-        if (!Physics.Raycast(body.position, -upAxis, out RaycastHit hit, probeDistance, probeMask))
+        if (!Physics.Raycast(body.position, -upAxis, out RaycastHit hit, probeDistance, probeMask, QueryTriggerInteraction.Ignore))
         {
             return false;
         }

@@ -125,7 +125,6 @@ public class OrbitalCamera : MonoBehaviour
     private void LateUpdate()
     {
 
-
         UpdateGravityAlignement();
         UpdateFocusPoint();
 
@@ -155,7 +154,7 @@ public class OrbitalCamera : MonoBehaviour
 
 
         //casting box cast until camera near clip plane
-        if (Physics.BoxCast(castFrom, CameraHalfExtends, castDirection, out RaycastHit hit, lookRotation, castDistance,obstructionMask))
+        if (Physics.BoxCast(castFrom, CameraHalfExtends, castDirection, out RaycastHit hit, lookRotation, castDistance,obstructionMask, QueryTriggerInteraction.Ignore))
         {
             //if something gets hit box is positioned as far as posible, then get offsetted to find the corresponding camera position
             rectPosition = castFrom + castDirection * hit.distance;
