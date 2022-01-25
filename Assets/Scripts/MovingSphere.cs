@@ -15,10 +15,10 @@ public class MovingSphere : MonoBehaviour
 
 
     [SerializeField, Range(0f, 100f)]
-    float maxSpeed = 10f, maxClimbSpeed = 2f;
+    float maxSpeed = 10f, maxClimbSpeed = 2f, maxSwimSpeed = 5f;
 
     [SerializeField, Range(0f, 100f)]
-    float maxAcceleration = 10f, maxAirAcceleration = 1f, maxClimbAcceleration = 20f;
+    float maxAcceleration = 10f, maxAirAcceleration = 1f, maxClimbAcceleration = 20f, maxSwimAcceleration = 5f;
 
     [SerializeField, Range(0f, 10f)]
     float jumpHeight = 2f;
@@ -635,6 +635,16 @@ public class MovingSphere : MonoBehaviour
             //make movement relative to wall and gravity, ignoring camera orientation
             xAxis = Vector3.Cross(contactNormal, upAxis);
             zAxis = upAxis;
+        }
+        else if (InWater)
+        {
+            //using swimming acc and speed but interpolated between regular ans swim values depending on how deep it is
+            float swimFactor = Mathf.Min(1f, submergence / swimThreshold);
+            
+            acceleration = Mathf.LerpUnclamped( IsGrounded ? maxAcceleration: maxAirAcceleration,maxSwimAcceleration,swimFactor);
+            speed = Mathf.LerpUnclamped( maxSpeed,maxSwimSpeed,swimFactor);
+            xAxis = rightAxis;
+            zAxis = forwardAxis;
         }
         else
         {
