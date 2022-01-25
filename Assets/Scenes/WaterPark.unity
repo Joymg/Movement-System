@@ -17006,6 +17006,10 @@ PrefabInstance:
     m_TransformParent: {fileID: 0}
     m_Modifications:
     - target: {fileID: 4548414025430605609, guid: ee47b5cfaadddcb468b3205853fb5029, type: 3}
+      propertyPath: buoyancy
+      value: 1.1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4548414025430605609, guid: ee47b5cfaadddcb468b3205853fb5029, type: 3}
       propertyPath: waterDrag
       value: 3
       objectReference: {fileID: 0}

@@ -87,7 +87,7 @@ public class MovingSphere : MonoBehaviour
     [SerializeField]
     Material normalMaterial = default, climbingMaterial = default, swimmingMaterial = default;
 
-    Vector2 playerInput;
+    Vector3 playerInput;
 
     Vector3 velocity, connectionVelocity;
 
@@ -221,7 +221,12 @@ public class MovingSphere : MonoBehaviour
 
         playerInput.x = Input.GetAxis("Horizontal");
         playerInput.y = Input.GetAxis("Vertical");
-        playerInput = Vector2.ClampMagnitude(playerInput, 1f);
+        
+        //adding a control for going up and down while swimming
+        //(before movement was controlled by gravity and buoyancy)
+        playerInput.z = Swimming ? Input.GetAxis("UpDown") : 0f;
+        
+        playerInput = Vector3.ClampMagnitude(playerInput, 1f);
 
         //if playerInputSpace is set
         if (playerInputSpace)
@@ -237,9 +242,17 @@ public class MovingSphere : MonoBehaviour
             forwardAxis = ProjectOnContactPlane(Vector3.forward, upAxis);
         }
 
-        desiredJump |= Input.GetButtonDown("Jump");
-        desiresClimb = Input.GetButton("Climb");
-        Debug.Log(desiresClimb);
+        //deactivating climbing while in water
+        if (Swimming)
+        {
+            desiresClimb = false;
+        }
+        else
+        {
+            desiredJump |= Input.GetButtonDown("Jump");
+            desiresClimb = Input.GetButton("Climb");
+        }
+
 
         //changing materials
         meshRenderer.material = 
@@ -411,6 +424,12 @@ public class MovingSphere : MonoBehaviour
         jumpPhase += 1;
         //Pressing jump quicky stacks too much upwards velocity
         float jumpSpeed = Mathf.Sqrt(2f * gravity.magnitude * jumpHeight);
+        
+        //simulating harder jumps in shallow water
+        if (InWater)
+        {
+            jumpSpeed *= Mathf.Max(0f, 1f - submergence / swimThreshold);
+        }
 
         //adding upward force to jump direction and normialize, getting the average of both,
         //making it not affecting ground jumps but lifting up when jumping from a wall
@@ -676,6 +695,15 @@ public class MovingSphere : MonoBehaviour
 
         //adjust velocity bya dding differences between new and old speeds
         velocity += xAxis * (newX - currentX) + zAxis * (newZ - currentZ);
+        Debug.Log("pre:"+ velocity.y);
+        if (Swimming) {
+            float currentY = Vector3.Dot(relativeVelocity, upAxis);
+            float newY = Mathf.MoveTowards(
+                currentY, playerInput.z * speed, maxSpeedChange
+            );
+            velocity += upAxis * (newY - currentY);
+            Debug.Log("post: "+ velocity.y);
+        }
     }
 
     /// <summary>
