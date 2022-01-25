@@ -212,7 +212,7 @@ MonoBehaviour:
   maxSpeed: 10
   maxClimbSpeed: 4
   maxSwimSpeed: 5
-  maxAcceleration: 10
+  maxAcceleration: 20
   maxAirAcceleration: 0
   maxClimbAcceleration: 40
   maxSwimAcceleration: 5
