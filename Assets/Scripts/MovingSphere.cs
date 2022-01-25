@@ -191,6 +191,12 @@ public class MovingSphere : MonoBehaviour
     /// </summary>
     bool InWater => submergence > 0f;
 
+    
+    [SerializeField, Range(0.01f, 1f)] private float swimThreshold = 0.5f;
+
+    //Only swimming if player is depp enough under water
+    private bool Swimming => submergence >= swimThreshold;
+
     MeshRenderer meshRenderer;
 
     private void Awake()
@@ -238,7 +244,7 @@ public class MovingSphere : MonoBehaviour
         //changing materials
         meshRenderer.material = 
             IsClimbing ? climbingMaterial : 
-            InWater ? swimmingMaterial : normalMaterial;
+            Swimming ? swimmingMaterial : normalMaterial;
     }
 
     private void FixedUpdate()
@@ -270,7 +276,7 @@ public class MovingSphere : MonoBehaviour
 
         else if(InWater)
         {
-            //if under water gravity sacaled by 1 - buoyancy scaled by submergence is applied to velocity,
+            //if under water gravity scaled by 1 - buoyancy scaled by submergence is applied to velocity,
             //overriding all other applications of gravity
             velocity += gravity * ((1f - buoyancy * submergence) * Time.deltaTime);
         }
@@ -306,7 +312,7 @@ public class MovingSphere : MonoBehaviour
         velocity = body.velocity;
 
         //if not on the ground call SnapToground
-        if (CheckCkimbing()|| IsGrounded || SnapToGround() || CheckSteepContacts())
+        if (CheckCkimbing()|| CheckSwimming() ||IsGrounded || SnapToGround() || CheckSteepContacts())
         {
             stepsSinceLastGrounded = 0;
             //checking if jumpPhase is less than maxAirJumps only works beacuse pahse is set back to zero directly after the jump
@@ -434,7 +440,7 @@ public class MovingSphere : MonoBehaviour
         //If a jump is executed snapping is aborted, afeter jumping the sphere
         //is considered grounded for a few seconds, so a small delay is added just in case
         //if the player is under water it should not snap to ground
-        if (stepsSinceLastGrounded > 1 || stepsSinceLastJump <= 2 || InWater)
+        if (stepsSinceLastGrounded > 1 || stepsSinceLastJump <= 2)
         {
             return false;
         }
@@ -508,6 +514,19 @@ public class MovingSphere : MonoBehaviour
             contactNormal = climbNormal;
             return true;
         }
+        return false;
+    }
+
+    bool CheckSwimming()
+    {
+        if (Swimming)
+        {
+            //if its swimming the count of ground contacts and the normal gets reseted
+            groundContactCount = 0;
+            contactNormal = upAxis;
+            return true;
+        }
+
         return false;
     }
 
