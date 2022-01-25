@@ -573,6 +573,10 @@ public class MovingSphere : MonoBehaviour
 
     private void EvaluateCollision(Collision collision)
     {
+        if (Swimming)
+        {
+            return;
+        }
         int layer = collision.gameObject.layer;
         float minDot = GetMinDot(collision.gameObject.layer);
         for (int i = 0; i < collision.contactCount; i++)
@@ -721,7 +725,7 @@ public class MovingSphere : MonoBehaviour
     {
         if ((waterMask & (1 << other.gameObject.layer)) !=0 )
         {
-            EvaluateSubmergence();
+            EvaluateSubmergence(other);
         }
     }
 
@@ -729,11 +733,11 @@ public class MovingSphere : MonoBehaviour
     {
         if ((waterMask & (1 << other.gameObject.layer)) != 0)
         {
-            EvaluateSubmergence();
+            EvaluateSubmergence(other);
         }
     }
 
-    void EvaluateSubmergence()
+    void EvaluateSubmergence(Collider collider)
     {
         //Increasing the length of the cast by small amount takes care of nearly all cases (except the ones moving really fast)
         if (Physics.Raycast(body.position + upAxis * submergenceOffset,
@@ -750,6 +754,11 @@ public class MovingSphere : MonoBehaviour
             //subsenquently if it does not hit player is completely submerged
             submergence = 1f;
             //but this might coause a invalid submergence of 1 when exiting the water
+        }
+
+        if (Swimming)
+        {
+            connectedBody = collider.attachedRigidbody;
         }
     }
 
