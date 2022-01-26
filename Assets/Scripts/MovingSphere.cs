@@ -13,6 +13,9 @@ public class MovingSphere : MonoBehaviour
     /// </summary>
     [SerializeField]
     Transform playerInputSpace = default;
+    
+    //Sphere Prefab now has a ball inside so we need a reference to it
+    [SerializeField]  Transform ball = default;
 
 
     [SerializeField, Range(0f, 100f)]
@@ -205,7 +208,7 @@ public class MovingSphere : MonoBehaviour
         body = GetComponent<Rigidbody>();
         //cause we are use custom gravity, RB gravity is desactivated
         body.useGravity = false;
-        meshRenderer = GetComponent<MeshRenderer>();
+        meshRenderer = ball.GetComponent<MeshRenderer>();
         OnValidate();
     }
 
@@ -255,10 +258,22 @@ public class MovingSphere : MonoBehaviour
         }
 
 
-        //changing materials
-        meshRenderer.material = 
-            IsClimbing ? climbingMaterial : 
-            Swimming ? swimmingMaterial : normalMaterial;
+        UpdateBall();
+    }
+
+    void UpdateBall()
+    {
+        Material ballMaterial = normalMaterial;
+        if (IsClimbing)
+        {
+            ballMaterial = climbingMaterial;
+        }
+        else if (Swimming)
+        {
+            ballMaterial = swimmingMaterial;
+        }
+
+        meshRenderer.material = ballMaterial;
     }
 
     private void FixedUpdate()
