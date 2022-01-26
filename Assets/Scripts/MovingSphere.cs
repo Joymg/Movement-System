@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using Microsoft.Win32.SafeHandles;
 using UnityEngine;
 
 
@@ -220,11 +221,11 @@ public class MovingSphere : MonoBehaviour
     {
 
         playerInput.x = Input.GetAxis("Horizontal");
-        playerInput.y = Input.GetAxis("Vertical");
+        playerInput.z = Input.GetAxis("Vertical");
         
         //adding a control for going up and down while swimming
         //(before movement was controlled by gravity and buoyancy)
-        playerInput.z = Swimming ? Input.GetAxis("UpDown") : 0f;
+        playerInput.y = Swimming ? Input.GetAxis("UpDown") : 0f;
         
         playerInput = Vector3.ClampMagnitude(playerInput, 1f);
 
@@ -681,32 +682,39 @@ public class MovingSphere : MonoBehaviour
         xAxis = ProjectOnContactPlane(xAxis,contactNormal);
         zAxis = ProjectOnContactPlane(zAxis,contactNormal);
 
-        //At this point, isalready known the velocity of what is under the body
+        //At this point, is already known the velocity of what is under the body
         Vector3 relativeVelocity = velocity - connectionVelocity;
 
         //project currentvelocity on both vectors to get relatives speeds
-        float currentX = Vector3.Dot(relativeVelocity, xAxis);
-        float currentZ = Vector3.Dot(relativeVelocity, zAxis);
+        /*float currentX = Vector3.Dot(relativeVelocity, xAxis);
+        float currentZ = Vector3.Dot(relativeVelocity, zAxis);*/
 
+        //Directly calculate desired velocity adjustment along x Y and Z
+        Vector3 adjustment;
+        adjustment.x = playerInput.x * speed - Vector3.Dot(relativeVelocity,xAxis);
+        adjustment.z = playerInput.z * speed - Vector3.Dot(relativeVelocity,zAxis);
+        adjustment.y = Swimming ?
+            playerInput.y * speed - Vector3.Dot(relativeVelocity,upAxis):0f;
+        
         //find maximum speed change this update
         float maxSpeedChange = acceleration * Time.deltaTime;
 
         //calculate new speeds relatives to ground
-        float newX =
+        /*float newX =
             Mathf.MoveTowards(currentX, playerInput.x * speed, maxSpeedChange);
         float newZ =
             Mathf.MoveTowards(currentZ, playerInput.y * speed, maxSpeedChange);
+            */
 
-        //adjust velocity bya dding differences between new and old speeds
-        velocity += xAxis * (newX - currentX) + zAxis * (newZ - currentZ);
-        Debug.Log("pre:"+ velocity.y);
+        adjustment = Vector3.ClampMagnitude(adjustment, acceleration * Time.deltaTime);
+        
+        //velocity change is X plus Z scaled by their adjustments
+        velocity += xAxis * adjustment.x + zAxis * adjustment.z;
+
         if (Swimming) {
-            float currentY = Vector3.Dot(relativeVelocity, upAxis);
-            float newY = Mathf.MoveTowards(
-                currentY, playerInput.z * speed, maxSpeedChange
-            );
-            velocity += upAxis * (newY - currentY);
-            Debug.Log("post: "+ velocity.y);
+            
+            //adding Y scaled by its adjustment if swimming
+            velocity += upAxis * adjustment.y;
         }
     }
 
