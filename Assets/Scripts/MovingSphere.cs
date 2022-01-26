@@ -91,6 +91,9 @@ public class MovingSphere : MonoBehaviour
     [SerializeField]
     Material normalMaterial = default, climbingMaterial = default, swimmingMaterial = default;
 
+    [SerializeField, Min(0.1f)]
+    float ballRadius = 0.5f;
+    
     Vector3 playerInput;
 
     Vector3 velocity, connectionVelocity;
@@ -99,6 +102,11 @@ public class MovingSphere : MonoBehaviour
     /// Saves the surface's normal that is in contact with
     /// </summary>
     Vector3 contactNormal;
+    
+    /// <summary>
+    /// Saves the last surface's normal that is in contact with
+    /// </summary>
+    Vector3 lastContactNormal;
 
     /// <summary>
     /// Saves the Steeps's normal that is in contact with
@@ -272,8 +280,21 @@ public class MovingSphere : MonoBehaviour
         {
             ballMaterial = swimmingMaterial;
         }
-
         meshRenderer.material = ballMaterial;
+
+        
+        Vector3 movement = body.velocity * Time.deltaTime;
+        float distance = movement.magnitude;
+        if (distance < 0.001f) {
+            return;
+        }
+        
+        //Rotation angle is the distance covered by the movement in radians divided by ballRadius
+        float angle = (float) (distance * (180f / Math.PI) / ballRadius);
+        
+        //rotationAxis is cross product of the lastContactNormal and the movement vector
+        Vector3 rotationAxis = Vector3.Cross(lastContactNormal, movement).normalized;
+        ball.localRotation = Quaternion.Euler(rotationAxis * angle) * ball.localRotation;
     }
 
     private void FixedUpdate()
@@ -375,6 +396,7 @@ public class MovingSphere : MonoBehaviour
 
     private void ClearState()
     {
+        lastContactNormal = contactNormal;
         groundContactCount = steepContactCount= climbContactCount =0;
         contactNormal = steepNormal = climbNormal = Vector3.zero;
         connectionVelocity = Vector3.zero;
