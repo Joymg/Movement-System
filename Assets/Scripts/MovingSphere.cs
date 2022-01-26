@@ -321,7 +321,19 @@ public class MovingSphere : MonoBehaviour
         movement -= rotationPlaneNormal * Vector3.Dot(movement, rotationPlaneNormal);
         
         float distance = movement.magnitude;
-        if (distance < 0.001f) {
+
+        Quaternion rotation = ball.localRotation;
+        if (connectedBody && connectedBody == previousConnectedBody)
+        {
+            //if its connected to a body it should rotate and align itself to it
+            rotation = Quaternion.Euler(connectedBody.angularVelocity * (Mathf.Rad2Deg * Time.deltaTime)) * rotation;
+            if (distance < 0.001f)
+            {
+                ball.localRotation = rotation;
+                return;
+            }
+        }
+        else if (distance < 0.001f) {
             return;
         }
         
@@ -331,8 +343,7 @@ public class MovingSphere : MonoBehaviour
         //rotationAxis is cross product of the lastContactNormal and the movement vector
         Vector3 rotationAxis = Vector3.Cross(rotationPlaneNormal, movement).normalized;
         
-        
-        Quaternion rotation = Quaternion.Euler(rotationAxis * angle) * ball.localRotation;
+        rotation = Quaternion.Euler(rotationAxis * angle) * rotation;
         if (ballAlignSpeed > 0f)
         {
             //added distance to align based on it
