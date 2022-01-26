@@ -17071,10 +17071,6 @@ PrefabInstance:
     m_TransformParent: {fileID: 0}
     m_Modifications:
     - target: {fileID: 4548414025430605609, guid: ee47b5cfaadddcb468b3205853fb5029, type: 3}
-      propertyPath: normalMaterial
-      value: 
-      objectReference: {fileID: 2100000, guid: c72677f29ca9dc741beca9e384cef6de, type: 2}
-    - target: {fileID: 4548414025430605609, guid: ee47b5cfaadddcb468b3205853fb5029, type: 3}
       propertyPath: playerInputSpace
       value: 
       objectReference: {fileID: 963194228}

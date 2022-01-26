@@ -94,6 +94,9 @@ public class MovingSphere : MonoBehaviour
     [SerializeField, Min(0.1f)]
     float ballRadius = 0.5f;
     
+    [SerializeField, Min(0f)]
+    float ballAlignSpeed = 180f;
+    
     Vector3 playerInput;
 
     Vector3 velocity, connectionVelocity;
@@ -294,7 +297,46 @@ public class MovingSphere : MonoBehaviour
         
         //rotationAxis is cross product of the lastContactNormal and the movement vector
         Vector3 rotationAxis = Vector3.Cross(lastContactNormal, movement).normalized;
-        ball.localRotation = Quaternion.Euler(rotationAxis * angle) * ball.localRotation;
+        
+        
+        Quaternion rotation = Quaternion.Euler(rotationAxis * angle) * ball.localRotation;
+        if (ballAlignSpeed > 0f)
+        {
+            //added distance to align based on it
+            rotation = AlignBallRotation(rotationAxis, rotation, distance);
+        }
+
+        ball.rotation = rotation;
+    }
+    
+    Quaternion AlignBallRotation(Vector3 rotationAxis, Quaternion rotation, float travelledDistance)
+    {
+
+        //adjusting the alignemet to keep it in sync with current up directiom
+        //minimal rotation is calculated from last aligned up tu current up,
+        //and then multiplied with current up to get the new one
+        Vector3 ballAxis = ball.up;
+
+        //find the angle between up vectors with their dot products
+        //dot product is clamped because folling ACos func needs a value between -1 and 1
+        float dot = Mathf.Clamp(Vector3.Dot(ballAxis, rotationAxis),-1f,1f);
+        //converting it to degrees
+        float angle = Mathf.Acos(dot) * Mathf.Rad2Deg;
+        //maximum angle allowed 
+        float maxAngle = ballAlignSpeed * travelledDistance;
+
+        Quaternion newAlignement = Quaternion.FromToRotation(ballAxis, rotationAxis) * rotation;
+
+        //if the angle is small enougth alignment is applied directly as usual
+        if (angle <= maxAngle)
+        {
+            return newAlignement;
+        }
+        //otherwise alignment is interpolated between current and desired position 
+        else
+        {
+            return Quaternion.SlerpUnclamped(rotation, newAlignement, maxAngle / angle);
+        }
     }
 
     private void FixedUpdate()
