@@ -115,6 +115,11 @@ public class MovingSphere : MonoBehaviour
     /// Saves the Steeps's normal that is in contact with
     /// </summary>
     Vector3 steepNormal;
+    
+    /// <summary>
+    /// Saves the last Steeps's normal that is in contact with
+    /// </summary>
+    Vector3 lastSteepNormal;
 
     /// <summary>
     /// Saves the surface's normal is in contact with when climbing
@@ -274,6 +279,9 @@ public class MovingSphere : MonoBehaviour
 
     void UpdateBall()
     {
+        //saving the last contact normal
+        Vector3 rotationPlaneNormal = lastContactNormal;
+        
         Material ballMaterial = normalMaterial;
         if (IsClimbing)
         {
@@ -282,6 +290,14 @@ public class MovingSphere : MonoBehaviour
         else if (Swimming)
         {
             ballMaterial = swimmingMaterial;
+        }
+        else if (!IsGrounded)
+        {
+            //if hits a steep
+            if (OnSteep)
+            {
+                lastContactNormal = lastSteepNormal;
+            }
         }
         meshRenderer.material = ballMaterial;
 
@@ -296,7 +312,7 @@ public class MovingSphere : MonoBehaviour
         float angle = (float) (distance * (180f / Math.PI) / ballRadius);
         
         //rotationAxis is cross product of the lastContactNormal and the movement vector
-        Vector3 rotationAxis = Vector3.Cross(lastContactNormal, movement).normalized;
+        Vector3 rotationAxis = Vector3.Cross(rotationPlaneNormal, movement).normalized;
         
         
         Quaternion rotation = Quaternion.Euler(rotationAxis * angle) * ball.localRotation;
@@ -439,6 +455,7 @@ public class MovingSphere : MonoBehaviour
     private void ClearState()
     {
         lastContactNormal = contactNormal;
+        lastSteepNormal = steepNormal;
         groundContactCount = steepContactCount= climbContactCount =0;
         contactNormal = steepNormal = climbNormal = Vector3.zero;
         connectionVelocity = Vector3.zero;
