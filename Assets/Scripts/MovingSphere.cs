@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using Microsoft.Win32.SafeHandles;
 using UnityEngine;
 
 
@@ -12,6 +13,9 @@ public class MovingSphere : MonoBehaviour
     /// </summary>
     [SerializeField]
     Transform playerInputSpace = default;
+    
+    //Sphere Prefab now has a ball inside so we need a reference to it
+    [SerializeField]  Transform ball = default;
 
 
     [SerializeField, Range(0f, 100f)]
@@ -87,19 +91,40 @@ public class MovingSphere : MonoBehaviour
     [SerializeField]
     Material normalMaterial = default, climbingMaterial = default, swimmingMaterial = default;
 
+    [SerializeField, Min(0.1f)]
+    float ballRadius = 0.5f;
+    
+    [SerializeField, Min(0f)]
+    float ballAlignSpeed = 180f;
+    
+    [SerializeField, Min(0f)]
+    float
+        ballAirRotation = 0.5f,
+        ballSwimRotation = 2f;
+    
     Vector3 playerInput;
 
-    Vector3 velocity, connectionVelocity;
+    Vector3 velocity, connectionVelocity, lastConnectionVelocity;
 
     /// <summary>
     /// Saves the surface's normal that is in contact with
     /// </summary>
     Vector3 contactNormal;
+    
+    /// <summary>
+    /// Saves the last surface's normal that is in contact with
+    /// </summary>
+    Vector3 lastContactNormal;
 
     /// <summary>
     /// Saves the Steeps's normal that is in contact with
     /// </summary>
     Vector3 steepNormal;
+    
+    /// <summary>
+    /// Saves the last Steeps's normal that is in contact with
+    /// </summary>
+    Vector3 lastSteepNormal;
 
     /// <summary>
     /// Saves the surface's normal is in contact with when climbing
@@ -204,7 +229,7 @@ public class MovingSphere : MonoBehaviour
         body = GetComponent<Rigidbody>();
         //cause we are use custom gravity, RB gravity is desactivated
         body.useGravity = false;
-        meshRenderer = GetComponent<MeshRenderer>();
+        meshRenderer = ball.GetComponent<MeshRenderer>();
         OnValidate();
     }
 
@@ -220,11 +245,11 @@ public class MovingSphere : MonoBehaviour
     {
 
         playerInput.x = Input.GetAxis("Horizontal");
-        playerInput.y = Input.GetAxis("Vertical");
+        playerInput.z = Input.GetAxis("Vertical");
         
         //adding a control for going up and down while swimming
         //(before movement was controlled by gravity and buoyancy)
-        playerInput.z = Swimming ? Input.GetAxis("UpDown") : 0f;
+        playerInput.y = Swimming ? Input.GetAxis("UpDown") : 0f;
         
         playerInput = Vector3.ClampMagnitude(playerInput, 1f);
 
@@ -254,10 +279,108 @@ public class MovingSphere : MonoBehaviour
         }
 
 
-        //changing materials
-        meshRenderer.material = 
-            IsClimbing ? climbingMaterial : 
-            Swimming ? swimmingMaterial : normalMaterial;
+        UpdateBall();
+    }
+
+    void UpdateBall()
+    {
+        //saving the last contact normal
+        Vector3 rotationPlaneNormal = lastContactNormal;
+        
+        Material ballMaterial = normalMaterial;
+        
+        float rotationFactor = 1f;
+        if (IsClimbing)
+        {
+            ballMaterial = climbingMaterial;
+        }
+        else if (Swimming)
+        {
+            ballMaterial = swimmingMaterial;
+            rotationFactor = ballSwimRotation;
+        }
+        else if (!IsGrounded)
+        {
+            //if hits a steep
+            if (OnSteep)
+            {
+                lastContactNormal = lastSteepNormal;
+            }
+            else
+            {
+                rotationFactor = ballAirRotation;
+            }
+        }
+        meshRenderer.material = ballMaterial;
+
+        //subtracting connected body velocity to stop rolling on top of moving platforms
+        Vector3 movement = (body.velocity - lastConnectionVelocity) * Time.deltaTime;
+        
+        //ignoring upward movement when gravity isn't uniform
+        //by projecting the movement on the rotation plane normal and subtracting that from it
+        movement -= rotationPlaneNormal * Vector3.Dot(movement, rotationPlaneNormal);
+        
+        float distance = movement.magnitude;
+
+        Quaternion rotation = ball.localRotation;
+        if (connectedBody && connectedBody == previousConnectedBody)
+        {
+            //if its connected to a body it should rotate and align itself to it
+            rotation = Quaternion.Euler(connectedBody.angularVelocity * (Mathf.Rad2Deg * Time.deltaTime)) * rotation;
+            if (distance < 0.001f)
+            {
+                ball.localRotation = rotation;
+                return;
+            }
+        }
+        else if (distance < 0.001f) {
+            return;
+        }
+        
+        //Rotation angle is the distance covered by the movement in radians divided by ballRadius
+        float angle = (float) (distance * rotationFactor * (180f / Math.PI) / ballRadius);
+        
+        //rotationAxis is cross product of the lastContactNormal and the movement vector
+        Vector3 rotationAxis = Vector3.Cross(rotationPlaneNormal, movement).normalized;
+        
+        rotation = Quaternion.Euler(rotationAxis * angle) * rotation;
+        if (ballAlignSpeed > 0f)
+        {
+            //added distance to align based on it
+            rotation = AlignBallRotation(rotationAxis, rotation, distance);
+        }
+
+        ball.rotation = rotation;
+    }
+    
+    Quaternion AlignBallRotation(Vector3 rotationAxis, Quaternion rotation, float travelledDistance)
+    {
+
+        //adjusting the alignemet to keep it in sync with current up directiom
+        //minimal rotation is calculated from last aligned up tu current up,
+        //and then multiplied with current up to get the new one
+        Vector3 ballAxis = ball.up;
+
+        //find the angle between up vectors with their dot products
+        //dot product is clamped because folling ACos func needs a value between -1 and 1
+        float dot = Mathf.Clamp(Vector3.Dot(ballAxis, rotationAxis),-1f,1f);
+        //converting it to degrees
+        float angle = Mathf.Acos(dot) * Mathf.Rad2Deg;
+        //maximum angle allowed 
+        float maxAngle = ballAlignSpeed * travelledDistance;
+
+        Quaternion newAlignement = Quaternion.FromToRotation(ballAxis, rotationAxis) * rotation;
+
+        //if the angle is small enougth alignment is applied directly as usual
+        if (angle <= maxAngle)
+        {
+            return newAlignement;
+        }
+        //otherwise alignment is interpolated between current and desired position 
+        else
+        {
+            return Quaternion.SlerpUnclamped(rotation, newAlignement, maxAngle / angle);
+        }
     }
 
     private void FixedUpdate()
@@ -359,6 +482,9 @@ public class MovingSphere : MonoBehaviour
 
     private void ClearState()
     {
+        lastContactNormal = contactNormal;
+        lastSteepNormal = steepNormal;
+        lastConnectionVelocity = connectionVelocity;
         groundContactCount = steepContactCount= climbContactCount =0;
         contactNormal = steepNormal = climbNormal = Vector3.zero;
         connectionVelocity = Vector3.zero;
@@ -681,32 +807,39 @@ public class MovingSphere : MonoBehaviour
         xAxis = ProjectOnContactPlane(xAxis,contactNormal);
         zAxis = ProjectOnContactPlane(zAxis,contactNormal);
 
-        //At this point, isalready known the velocity of what is under the body
+        //At this point, is already known the velocity of what is under the body
         Vector3 relativeVelocity = velocity - connectionVelocity;
 
         //project currentvelocity on both vectors to get relatives speeds
-        float currentX = Vector3.Dot(relativeVelocity, xAxis);
-        float currentZ = Vector3.Dot(relativeVelocity, zAxis);
+        /*float currentX = Vector3.Dot(relativeVelocity, xAxis);
+        float currentZ = Vector3.Dot(relativeVelocity, zAxis);*/
 
+        //Directly calculate desired velocity adjustment along x Y and Z
+        Vector3 adjustment;
+        adjustment.x = playerInput.x * speed - Vector3.Dot(relativeVelocity,xAxis);
+        adjustment.z = playerInput.z * speed - Vector3.Dot(relativeVelocity,zAxis);
+        adjustment.y = Swimming ?
+            playerInput.y * speed - Vector3.Dot(relativeVelocity,upAxis):0f;
+        
         //find maximum speed change this update
         float maxSpeedChange = acceleration * Time.deltaTime;
 
         //calculate new speeds relatives to ground
-        float newX =
+        /*float newX =
             Mathf.MoveTowards(currentX, playerInput.x * speed, maxSpeedChange);
         float newZ =
             Mathf.MoveTowards(currentZ, playerInput.y * speed, maxSpeedChange);
+            */
 
-        //adjust velocity bya dding differences between new and old speeds
-        velocity += xAxis * (newX - currentX) + zAxis * (newZ - currentZ);
-        Debug.Log("pre:"+ velocity.y);
+        adjustment = Vector3.ClampMagnitude(adjustment, acceleration * Time.deltaTime);
+        
+        //velocity change is X plus Z scaled by their adjustments
+        velocity += xAxis * adjustment.x + zAxis * adjustment.z;
+
         if (Swimming) {
-            float currentY = Vector3.Dot(relativeVelocity, upAxis);
-            float newY = Mathf.MoveTowards(
-                currentY, playerInput.z * speed, maxSpeedChange
-            );
-            velocity += upAxis * (newY - currentY);
-            Debug.Log("post: "+ velocity.y);
+            
+            //adding Y scaled by its adjustment if swimming
+            velocity += upAxis * adjustment.y;
         }
     }
 
