@@ -303,6 +303,11 @@ public class MovingSphere : MonoBehaviour
 
         
         Vector3 movement = body.velocity * Time.deltaTime;
+        
+        //ignoring upward movement when gravity isn't uniform
+        //by projecting the movement on the rotation plane normal and subtracting that from the movement 
+        movement -= rotationPlaneNormal * Vector3.Dot(movement, rotationPlaneNormal);
+        
         float distance = movement.magnitude;
         if (distance < 0.001f) {
             return;
