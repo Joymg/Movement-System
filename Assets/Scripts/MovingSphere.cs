@@ -97,6 +97,11 @@ public class MovingSphere : MonoBehaviour
     [SerializeField, Min(0f)]
     float ballAlignSpeed = 180f;
     
+    [SerializeField, Min(0f)]
+    float
+        ballAirRotation = 0.5f,
+        ballSwimRotation = 2f;
+    
     Vector3 playerInput;
 
     Vector3 velocity, connectionVelocity;
@@ -283,6 +288,8 @@ public class MovingSphere : MonoBehaviour
         Vector3 rotationPlaneNormal = lastContactNormal;
         
         Material ballMaterial = normalMaterial;
+        
+        float rotationFactor = 1f;
         if (IsClimbing)
         {
             ballMaterial = climbingMaterial;
@@ -290,6 +297,7 @@ public class MovingSphere : MonoBehaviour
         else if (Swimming)
         {
             ballMaterial = swimmingMaterial;
+            rotationFactor = ballSwimRotation;
         }
         else if (!IsGrounded)
         {
@@ -298,6 +306,10 @@ public class MovingSphere : MonoBehaviour
             {
                 lastContactNormal = lastSteepNormal;
             }
+            else
+            {
+                rotationFactor = ballAirRotation;
+            }
         }
         meshRenderer.material = ballMaterial;
 
@@ -305,7 +317,7 @@ public class MovingSphere : MonoBehaviour
         Vector3 movement = body.velocity * Time.deltaTime;
         
         //ignoring upward movement when gravity isn't uniform
-        //by projecting the movement on the rotation plane normal and subtracting that from the movement 
+        //by projecting the movement on the rotation plane normal and subtracting that from it
         movement -= rotationPlaneNormal * Vector3.Dot(movement, rotationPlaneNormal);
         
         float distance = movement.magnitude;
@@ -314,7 +326,7 @@ public class MovingSphere : MonoBehaviour
         }
         
         //Rotation angle is the distance covered by the movement in radians divided by ballRadius
-        float angle = (float) (distance * (180f / Math.PI) / ballRadius);
+        float angle = (float) (distance * rotationFactor * (180f / Math.PI) / ballRadius);
         
         //rotationAxis is cross product of the lastContactNormal and the movement vector
         Vector3 rotationAxis = Vector3.Cross(rotationPlaneNormal, movement).normalized;
