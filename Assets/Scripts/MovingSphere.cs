@@ -15,10 +15,10 @@ public class MovingSphere : MonoBehaviour
 
 
     [SerializeField, Range(0f, 100f)]
-    float maxSpeed = 10f, maxClimbSpeed = 2f;
+    float maxSpeed = 10f, maxClimbSpeed = 2f, maxSwimSpeed = 5f;
 
     [SerializeField, Range(0f, 100f)]
-    float maxAcceleration = 10f, maxAirAcceleration = 1f, maxClimbAcceleration = 20f;
+    float maxAcceleration = 10f, maxAirAcceleration = 1f, maxClimbAcceleration = 20f, maxSwimAcceleration = 5f;
 
     [SerializeField, Range(0f, 10f)]
     float jumpHeight = 2f;
@@ -75,12 +75,19 @@ public class MovingSphere : MonoBehaviour
     LayerMask climbMask = -1;
 
     /// <summary>
+    /// Layer used to detect collinsions with Water
+    /// </summary>
+    [SerializeField]
+    LayerMask waterMask = 0;
+
+
+    /// <summary>
     /// Saving different materiasl to distinguissh from normal movement or climbing
     /// </summary>
     [SerializeField]
-    Material normalMaterial = default, climbingMaterial = default;
+    Material normalMaterial = default, climbingMaterial = default, swimmingMaterial = default;
 
-    Vector2 playerInput;
+    Vector3 playerInput;
 
     Vector3 velocity, connectionVelocity;
 
@@ -152,7 +159,43 @@ public class MovingSphere : MonoBehaviour
     int climbContactCount;
 
     //turning off climbing if we just jumped
+    //threshold is 2 to give some sapce and not beeig too rigid
     bool IsClimbing => climbContactCount > 0 && stepsSinceLastJump > 2;
+
+
+    /// <summary>
+    /// Keeps track of the sphere submergence state, 0 no water, 1 completely submerged
+    /// </summary>
+    float submergence;
+
+    [SerializeField]
+    float submergenceOffset = 0.5f;
+
+    [SerializeField, Min(0.1f)]
+    float submergenceRange = 1f;
+
+    /// <summary>
+    /// Value for the buoyancy or how much it floats
+    /// </summary>
+    [SerializeField, Min(0f)]
+    float buoyancy = 1f;
+
+    /// <summary>
+    /// Value of acceleration drag underwater
+    /// </summary>
+    [SerializeField, Range(0f, 10f)]
+    float waterDrag = 1f;
+
+    /// <summary>
+    /// Indicates if the player is in the water
+    /// </summary>
+    bool InWater => submergence > 0f;
+
+    
+    [SerializeField, Range(0.01f, 1f)] private float swimThreshold = 0.5f;
+
+    //Only swimming if player is depp enough under water
+    private bool Swimming => submergence >= swimThreshold;
 
     MeshRenderer meshRenderer;
 
@@ -178,7 +221,12 @@ public class MovingSphere : MonoBehaviour
 
         playerInput.x = Input.GetAxis("Horizontal");
         playerInput.y = Input.GetAxis("Vertical");
-        playerInput = Vector2.ClampMagnitude(playerInput, 1f);
+        
+        //adding a control for going up and down while swimming
+        //(before movement was controlled by gravity and buoyancy)
+        playerInput.z = Swimming ? Input.GetAxis("UpDown") : 0f;
+        
+        playerInput = Vector3.ClampMagnitude(playerInput, 1f);
 
         //if playerInputSpace is set
         if (playerInputSpace)
@@ -194,18 +242,36 @@ public class MovingSphere : MonoBehaviour
             forwardAxis = ProjectOnContactPlane(Vector3.forward, upAxis);
         }
 
-        desiredJump |= Input.GetButtonDown("Jump");
-        desiresClimb = Input.GetButton("Climb");
-        Debug.Log(desiresClimb);
+        //deactivating climbing while in water
+        if (Swimming)
+        {
+            desiresClimb = false;
+        }
+        else
+        {
+            desiredJump |= Input.GetButtonDown("Jump");
+            desiresClimb = Input.GetButton("Climb");
+        }
 
-        meshRenderer.material = IsClimbing ? climbingMaterial : normalMaterial;
 
+        //changing materials
+        meshRenderer.material = 
+            IsClimbing ? climbingMaterial : 
+            Swimming ? swimmingMaterial : normalMaterial;
     }
+
     private void FixedUpdate()
     {
         //adding suport for chaging gravity direction, it points in the opposite direction that gravity pulls
         Vector3 gravity = CustomGravity.GetGravity(body.position, out upAxis);
         UpdateState();
+
+        //linear dampening 
+        if (InWater)
+        {
+            //progressive drag, the more submerged the slower
+            velocity *= 1f - waterDrag *submergence* Time.deltaTime;
+        }
 
         AdjustVelocity();
         
@@ -219,6 +285,13 @@ public class MovingSphere : MonoBehaviour
         if (IsClimbing)
         {
             velocity -= contactNormal * (maxClimbAcceleration * 0.9f * Time.deltaTime);
+        }
+
+        else if(InWater)
+        {
+            //if under water gravity scaled by 1 - buoyancy scaled by submergence is applied to velocity,
+            //overriding all other applications of gravity
+            velocity += gravity * ((1f - buoyancy * submergence) * Time.deltaTime);
         }
 
         else if (IsGrounded && velocity.sqrMagnitude < 0.01f)
@@ -252,7 +325,7 @@ public class MovingSphere : MonoBehaviour
         velocity = body.velocity;
 
         //if not on the ground call SnapToground
-        if (CheckCkimbing()|| IsGrounded || SnapToGround() || CheckSteepContacts())
+        if (CheckCkimbing()|| CheckSwimming() ||IsGrounded || SnapToGround() || CheckSteepContacts())
         {
             stepsSinceLastGrounded = 0;
             //checking if jumpPhase is less than maxAirJumps only works beacuse pahse is set back to zero directly after the jump
@@ -295,6 +368,8 @@ public class MovingSphere : MonoBehaviour
 
         //reset connected body
         connectedBody = null;
+
+        submergence = 0f;
     }
 
     private void UpdateConnectionState()
@@ -349,6 +424,12 @@ public class MovingSphere : MonoBehaviour
         jumpPhase += 1;
         //Pressing jump quicky stacks too much upwards velocity
         float jumpSpeed = Mathf.Sqrt(2f * gravity.magnitude * jumpHeight);
+        
+        //simulating harder jumps in shallow water
+        if (InWater)
+        {
+            jumpSpeed *= Mathf.Max(0f, 1f - submergence / swimThreshold);
+        }
 
         //adding upward force to jump direction and normialize, getting the average of both,
         //making it not affecting ground jumps but lifting up when jumping from a wall
@@ -377,6 +458,7 @@ public class MovingSphere : MonoBehaviour
 
         //If a jump is executed snapping is aborted, afeter jumping the sphere
         //is considered grounded for a few seconds, so a small delay is added just in case
+        //if the player is under water it should not snap to ground
         if (stepsSinceLastGrounded > 1 || stepsSinceLastJump <= 2)
         {
             return false;
@@ -388,7 +470,7 @@ public class MovingSphere : MonoBehaviour
         }
         //snapping will only be produced if there's ground below the sphere.
         //hit allows to check if the thing below the sphere counts as ground
-        if (!Physics.Raycast(body.position, -upAxis, out RaycastHit hit, probeDistance, probeMask))
+        if (!Physics.Raycast(body.position, -upAxis, out RaycastHit hit, probeDistance, probeMask, QueryTriggerInteraction.Ignore))
         {
             return false;
         }
@@ -454,6 +536,19 @@ public class MovingSphere : MonoBehaviour
         return false;
     }
 
+    bool CheckSwimming()
+    {
+        if (Swimming)
+        {
+            //if its swimming the count of ground contacts and the normal gets reseted
+            groundContactCount = 0;
+            contactNormal = upAxis;
+            return true;
+        }
+
+        return false;
+    }
+
     /// <summary>
     /// Determines the appropiete minimun given a layer
     /// </summary>
@@ -478,6 +573,10 @@ public class MovingSphere : MonoBehaviour
 
     private void EvaluateCollision(Collision collision)
     {
+        if (Swimming)
+        {
+            return;
+        }
         int layer = collision.gameObject.layer;
         float minDot = GetMinDot(collision.gameObject.layer);
         for (int i = 0; i < collision.contactCount; i++)
@@ -560,6 +659,16 @@ public class MovingSphere : MonoBehaviour
             xAxis = Vector3.Cross(contactNormal, upAxis);
             zAxis = upAxis;
         }
+        else if (InWater)
+        {
+            //using swimming acc and speed but interpolated between regular ans swim values depending on how deep it is
+            float swimFactor = Mathf.Min(1f, submergence / swimThreshold);
+            
+            acceleration = Mathf.LerpUnclamped( IsGrounded ? maxAcceleration: maxAirAcceleration,maxSwimAcceleration,swimFactor);
+            speed = Mathf.LerpUnclamped( maxSpeed,maxSwimSpeed,swimFactor);
+            xAxis = rightAxis;
+            zAxis = forwardAxis;
+        }
         else
         {
             acceleration = IsGrounded ? maxAcceleration : maxAirAcceleration;
@@ -590,6 +699,15 @@ public class MovingSphere : MonoBehaviour
 
         //adjust velocity bya dding differences between new and old speeds
         velocity += xAxis * (newX - currentX) + zAxis * (newZ - currentZ);
+        Debug.Log("pre:"+ velocity.y);
+        if (Swimming) {
+            float currentY = Vector3.Dot(relativeVelocity, upAxis);
+            float newY = Mathf.MoveTowards(
+                currentY, playerInput.z * speed, maxSpeedChange
+            );
+            velocity += upAxis * (newY - currentY);
+            Debug.Log("post: "+ velocity.y);
+        }
     }
 
     /// <summary>
@@ -601,6 +719,47 @@ public class MovingSphere : MonoBehaviour
     private Vector3 ProjectOnContactPlane(Vector3 vector,Vector3 normal)
     {
         return vector - contactNormal * Vector3.Dot(vector, contactNormal);
+    }
+
+    private void OnTriggerEnter(Collider other)
+    {
+        if ((waterMask & (1 << other.gameObject.layer)) !=0 )
+        {
+            EvaluateSubmergence(other);
+        }
+    }
+
+    private void OnTriggerStay(Collider other)
+    {
+        if ((waterMask & (1 << other.gameObject.layer)) != 0)
+        {
+            EvaluateSubmergence(other);
+        }
+    }
+
+    void EvaluateSubmergence(Collider collider)
+    {
+        //Increasing the length of the cast by small amount takes care of nearly all cases (except the ones moving really fast)
+        if (Physics.Raycast(body.position + upAxis * submergenceOffset,
+            -upAxis, out RaycastHit hit, submergenceRange + 1,
+            waterMask, QueryTriggerInteraction.Collide))
+        {
+            submergence = 1f - hit.distance / submergenceRange;
+
+        }
+
+        //submergence works until fully submerged, beacause the raycast is casted from inside the collider so it fails to hit
+        else
+        {
+            //subsenquently if it does not hit player is completely submerged
+            submergence = 1f;
+            //but this might coause a invalid submergence of 1 when exiting the water
+        }
+
+        if (Swimming)
+        {
+            connectedBody = collider.attachedRigidbody;
+        }
     }
 
 }
