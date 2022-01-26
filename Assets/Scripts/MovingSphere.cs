@@ -104,7 +104,7 @@ public class MovingSphere : MonoBehaviour
     
     Vector3 playerInput;
 
-    Vector3 velocity, connectionVelocity;
+    Vector3 velocity, connectionVelocity, lastConnectionVelocity;
 
     /// <summary>
     /// Saves the surface's normal that is in contact with
@@ -313,8 +313,8 @@ public class MovingSphere : MonoBehaviour
         }
         meshRenderer.material = ballMaterial;
 
-        
-        Vector3 movement = body.velocity * Time.deltaTime;
+        //subtracting connected body velocity to stop rolling on top of moving platforms
+        Vector3 movement = (body.velocity - lastConnectionVelocity) * Time.deltaTime;
         
         //ignoring upward movement when gravity isn't uniform
         //by projecting the movement on the rotation plane normal and subtracting that from it
@@ -473,6 +473,7 @@ public class MovingSphere : MonoBehaviour
     {
         lastContactNormal = contactNormal;
         lastSteepNormal = steepNormal;
+        lastConnectionVelocity = connectionVelocity;
         groundContactCount = steepContactCount= climbContactCount =0;
         contactNormal = steepNormal = climbNormal = Vector3.zero;
         connectionVelocity = Vector3.zero;
