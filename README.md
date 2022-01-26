@@ -3,16 +3,16 @@
 A movement system implemented in Unity.
 
 Implemented features:
-- Basic Physics
-- Surface Contact: How the player interacts with the surfaces, allowing wall jumps, "realistic" jumps from steeps, getting out of crevasses etc.
-- Orbital Camera: Orbits around the player with manual or automatic rotation. Make movement relative to the camera. Prevent camera form intersecting with the world
-- Custom Gravity: Allows arbitary gravity. Apply custom gravity to arbitrary bodies.
-- Complex Gravity: Supports multiple gravity sources. Created planar, spherical, and box-shaped gravity sources. Adding gravity falloff.
-- Moving environment: Animated platforms. Player follows motion of the platform is connected to.
-- Climbing: Climbable and unclimbable surfaces. Stick to walls, even if they're moving. Use wall-relative controls for climbing. Climb around corners and overhangs. Prevent sliding while standing on a slope
-- Reactive environement: Launch pads and levitation zones. Multi-purpose detection zone. Reactively swap materials and activate or deactivate objects. Move objects via simple interpolation triggered by events.
+- **Basic Physics**
+- **Surface Contact:** How the player interacts with the surfaces, allowing wall jumps, "realistic" jumps from steeps, getting out of crevasses etc.
+- **Orbital Camera:** Orbits around the player with manual or automatic rotation. Make movement relative to the camera. Prevent camera form intersecting with the world
+- **Custom Gravity:** Allows arbitary gravity. Apply custom gravity to arbitrary bodies.
+- **Complex Gravity:** Supports multiple gravity sources. Created planar, spherical, and box-shaped gravity sources. Adding gravity falloff.
+- **Moving environment:** Animated platforms. Player follows motion of the platform is connected to.
+- **Climbing:** Climbable and unclimbable surfaces. Stick to walls, even if they're moving. Use wall-relative controls for climbing. Climb around corners and overhangs. Prevent sliding while standing on a slope
+- **Reactive environement:** Launch pads and levitation zones. Multi-purpose detection zone. Reactively swap materials and activate or deactivate objects. Move objects via simple interpolation triggered by events.
+- **Swimming:** Detect water volumes. Apply water drag and buoyancy. Swim through water, including up and down. Make objects float.
+- **Rolling:** Accelerate based on current velocity. Make the sphere visually roll. Align the sphere with its motion. Keep it aligned with the ground, even when it moves.
 
 Coming Next:
-- Rolling
 - Support for tactile devices
-- Swimming(?)
